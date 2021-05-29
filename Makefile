@@ -7,7 +7,7 @@ FILLUPDIR       = /usr/share/fillup-templates/
 PYTHONSITEARCH  = /usr/lib/python3.6/site-packages/
 TOPACKAGE       = Makefile addons cups etc plugins python profiles sbin setup salt tools templates updates README.md
 HERE            = $(shell pwd)
-REPO            = /data1/OSC/home:varkoly:OSS-4-1:leap15.1
+REPO            = /data1/OSC/home:pvarkoly:OSS-4-1:leap15.1
 PACKAGE         = oss-base
 
 install:
