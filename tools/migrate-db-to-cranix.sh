@@ -63,3 +63,13 @@ else
 	systemctl restart cranix-api
 fi
 
+for i in $( grep OSS in /etc/postfix/mysql*.cf )
+do
+	sed -i s/OSSConfig/CrxConfig/g $i
+	sed -i s/OSS/CRX/g $i
+done
+echo "grant SELECT on CRX.Groups  to 'postfix'@'localhost'  identified by 'postfix';" | mysql
+echo "grant SELECT on CRX.GroupMember  to 'postfix'@'localhost'  identified by 'postfix';" | mysql
+echo "grant SELECT on CRX.CrxConfig  to 'postfix'@'localhost'  identified by 'postfix';" | mysql
+echo "grant SELECT (id,uid) on CRX.Users to 'postfix'@'localhost'  identified by 'postfix'" | mysql
+echo "grant SELECT on CRX.Aliases to 'postfix'@'localhost'  identified by 'postfix';" | mysql
