@@ -118,6 +118,8 @@ def read_csv():
     #Copy the import file into the import directory
     if input_file != import_dir + '/userlist.txt':
         os.system('cp ' + input_file + ' ' + import_dir + '/userlist.txt')
+    # fix some dos stuff
+    os.system("/usr/bin/dos2unix " + input_file)
     with open(input_file) as csvfile:
         #Detect the type of the csv file
         dialect = ""
