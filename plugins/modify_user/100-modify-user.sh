@@ -34,6 +34,7 @@ msquota=0
 abort() {
 	TASK="modify_user-$( uuidgen -t )"
 	mkdir -p /var/adm/cranix/opentasks/
+	echo "reason: $1"            >> /var/adm/cranix/opentasks/$TASK
 	echo "uid: $uid"             >> /var/adm/cranix/opentasks/$TASK
 	echo "password: $password"   >> /var/adm/cranix/opentasks/$TASK
 	echo "mpassword: $mpassword" >> /var/adm/cranix/opentasks/$TASK
@@ -101,7 +102,7 @@ sn: $surname" > $FILE
 ldbmodify  -H /var/lib/samba/private/sam.ldb $FILE
 if [ $? != 0 ]; then
    rm -f $FILE
-   abort
+   abort 1
 fi
 rm -f $FILE
 
@@ -113,5 +114,8 @@ fi
 
 if [ "$password" ]; then
     samba-tool user setpassword $uid --newpassword="$password" $ADDPARAM
+    if [ $? != 0 ]; then
+       abort 2
+    fi
 fi
 

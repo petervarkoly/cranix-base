@@ -4,6 +4,7 @@
 abort() {
         TASK="add_device-$( uuidgen -t )"
         mkdir -p /var/adm/cranix/opentasks/
+	echo "reason: $1" >> /var/adm/cranix/opentasks/$TASK
         echo "name: $name" >> /var/adm/cranix/opentasks/$TASK
         echo "ip: $ip" >> /var/adm/cranix/opentasks/$TASK
         echo "mac: $mac" >> /var/adm/cranix/opentasks/$TASK
@@ -43,12 +44,12 @@ passwd=$( grep de.cranix.dao.User.Register.Password= /opt/cranix-java/conf/crani
 
 samba-tool dns add localhost $CRANIX_DOMAIN $name  A $ip   -U register%"$passwd"
 if [ $? != 0 ]; then
-   abort
+   abort 1
 fi
 if [ "$wlanip" -a "$wlanmac" ]; then
 	samba-tool dns add localhost $CRANIX_DOMAIN "${name}-wlan"  A $wlanip   -U register%"$passwd"
 	if [ $? != 0 ]; then
-	   abort
+	   abort 2
 	fi
 fi
 

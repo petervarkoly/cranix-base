@@ -46,13 +46,13 @@ elif netmask > 7:
 if os.system("samba-tool dns delete localhost " + revdomain + " " + rdomain + " PTR " + name + "." + domain + "  -U register%" + passwd ) != 0:
   TASK = "/var/adm/cranix/opentasks/101-delete-device-" + os.popen('uuidgen -t').read().rstrip()
   with open(TASK, "w") as f:
-    f.write("ip: "+','.join(ip))
-    f.write("name: "+name)
+    f.write("ip: "+'.'.join(ip) +"\n")
+    f.write("name: "+name +"\n")
     f.write("wlanip: " + '.'.join(wlanip))
 
 if wlanip != []:
   if os.system("samba-tool dns delete localhost " + revdomain + " " + revwlan + " PTR " + name + "-wlan." + domain + "  -U register%" + passwd ) != 0:
-    TASK = "/var/adm/cranix/opentasks/101-add-device-" + os.popen('uuidgen -t').read().rstrip()
+    TASK = "/var/adm/cranix/opentasks/101-delete-device-" + os.popen('uuidgen -t').read().rstrip()
     with open(TASK, "w") as f:
       f.write("ip: "+'.'.join(ip) +"\n")
       f.write("name: "+name +"\n")

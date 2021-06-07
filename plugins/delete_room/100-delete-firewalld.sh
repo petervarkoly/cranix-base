@@ -34,5 +34,5 @@ do
   esac
 done
 
-firewall-cmd  --permanent --delete-zone=${name}
+firewall-cmd --permanent --delete-zone=${name}
 firewall-cmd --reload
