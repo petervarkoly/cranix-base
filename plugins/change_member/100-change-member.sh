@@ -23,7 +23,7 @@ fi
 abort() {
         TASK="change_member-$( uuidgen -t )"
         mkdir -p /var/adm/cranix/opentasks/
-        echo "changetype: $changeType" >> /var/adm/cranix/opentasks/$TASK
+        echo "changeType: $changeType" >> /var/adm/cranix/opentasks/$TASK
         echo "group: $group" >> /var/adm/cranix/opentasks/$TASK
         echo "users: $users" >> /var/adm/cranix/opentasks/$TASK
         exit 1
@@ -42,7 +42,7 @@ do
      c=""
   fi
   case "${b,,}" in
-    changeType)
+    changetype)
       changeType="${c}"
     ;;
     group)
