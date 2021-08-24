@@ -42,7 +42,7 @@ done
 
 passwd=$( grep de.cranix.dao.User.Register.Password= /opt/cranix-java/conf/cranix-api.properties | sed 's/de.cranix.dao.User.Register.Password=//' )
 
-samba-tool dns add localhost $CRANIX_DOMAIN $name  A $ip   -U register%"$passwd"
+samba-tool computer add --ip-address=${ip} "${name}" -U register%"${passwd}"
 if [ $? != 0 ]; then
    abort 1
 fi
