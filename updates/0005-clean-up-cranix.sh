@@ -11,4 +11,6 @@ if [ "${EFOUND}" ]; then
 fi
 sed -i s#https://support.extis.de/support#https://repo.cephalix.eu/api/tickets/add#    /etc/sysconfig/cranix
 sed -i s#https://support.cephalix.de/support#https://repo.cephalix.eu/api/tickets/add# /etc/sysconfig/cranix
+#Remove hard coded repo.cephalix.eu entry in hosts
+sed -i /repo.cephalix.eu/d /etc/hosts
 
