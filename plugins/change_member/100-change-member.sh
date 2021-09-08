@@ -42,7 +42,7 @@ do
      c=""
   fi
   case "${b,,}" in
-    changeType)
+    changetype)
       changeType="${c}"
     ;;
     group)

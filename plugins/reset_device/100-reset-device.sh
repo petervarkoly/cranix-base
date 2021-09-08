@@ -2,9 +2,9 @@
 . /etc/sysconfig/cranix
 
 abort() {
-        TASK="add_device-$( uuidgen -t )"
+        TASK="reset_device-$( uuidgen -t )"
         mkdir -p /var/adm/cranix/opentasks/
-	echo "reason: $1" >> /var/adm/cranix/opentasks/$TASK
+        echo "reason: $1" >> /var/adm/cranix/opentasks/$TASK
         echo "name: $name" >> /var/adm/cranix/opentasks/$TASK
         echo "ip: $ip" >> /var/adm/cranix/opentasks/$TASK
         echo "mac: $mac" >> /var/adm/cranix/opentasks/$TASK
@@ -40,16 +40,13 @@ do
   esac
 done
 
+MINION="${name}.${CRANIX_DOMAIN}"
 passwd=$( grep de.cranix.dao.User.Register.Password= /opt/cranix-java/conf/cranix-api.properties | sed 's/de.cranix.dao.User.Register.Password=//' )
 
-samba-tool computer add --ip-address=${ip} "${name}" -U register%"${passwd}"
+/usr/bin/samba-tool computer delete "${name}"
+/usr/bin/salt-key -yd "${MINION}"
 if [ $? != 0 ]; then
    abort 1
 fi
-if [ "$wlanip" -a "$wlanmac" ]; then
-	samba-tool dns add localhost $CRANIX_DOMAIN "${name}-wlan"  A $wlanip   -U register%"$passwd"
-	if [ $? != 0 ]; then
-	   abort 2
-	fi
-fi
+/usr/bin/samba-tool computer add --ip-address=${ip} "${name}" -U register%"${passwd}"
 
