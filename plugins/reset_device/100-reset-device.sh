@@ -40,10 +40,10 @@ do
   esac
 done
 
-MINION="${CLIENT}.${CRANIX_DOMAIN}"
+MINION="${name}.${CRANIX_DOMAIN}"
 passwd=$( grep de.cranix.dao.User.Register.Password= /opt/cranix-java/conf/cranix-api.properties | sed 's/de.cranix.dao.User.Register.Password=//' )
 
-/usr/bin/samba-tool computer delete "${CLIENT}"
+/usr/bin/samba-tool computer delete "${name}"
 /usr/bin/salt-key -yd "${MINION}"
 if [ $? != 0 ]; then
    abort 1
