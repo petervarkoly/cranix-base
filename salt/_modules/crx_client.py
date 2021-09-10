@@ -120,7 +120,7 @@ def disableUpdates():
 
 def enableUpdates():
   if __grains__['os_family'] == 'Windows':
-    os.system("sc config wuauserv start= enabled")
+    os.system("sc config wuauserv start= auto")
     os.system("net start wuauserv")
   return True
 
