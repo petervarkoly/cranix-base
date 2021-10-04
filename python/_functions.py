@@ -14,10 +14,10 @@ def read_birthday(bd):
         y=""
         m=""
         d=""
-        if lbd < 9 and lbd > 6:
-            y=bd[lbd-4:lbd]
-            m=bd[lbd-6:lbd-4]
-            d=bd[:lbd-6]
+        if lbd == 8:
+            y=bd[:4]
+            m=bd[4:6]
+            d=bd[7:]
             #TODO Test y m and d
             return "{:4s}-{:0>2s}-{:0>2s}".format(y,m,d)
         else:
