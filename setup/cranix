@@ -434,3 +434,9 @@ CRANIX_ALLOW_WINDOWS_UPDATES="no"
 # DNS Domain of the institute for wich official certificate was created.
 # This can be empty if this is the normal DNS domain
 CRANIX_CERT_DOMAIN=""
+
+## Type:        yesno
+## Default:     yes
+# This is the default setting for must change in the change password interface.
+CRANIX_DEFAULT_MUST_CHANGE="yes"
+
