@@ -6,4 +6,5 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Fold
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /t REG_EXPAND_SZ /v "Desktop" /d "%USERPROFILE%\Desktop" /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /t REG_EXPAND_SZ /v "My Video" /d "%USERPROFILE%\Videos" /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /t REG_EXPAND_SZ /v "My Music" /d "%USERPROFILE%\Music" /f
-
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /t REG_EXPAND_SZ /v "AppData" /d "%USERPROFILE%\AppData" /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /t REG_EXPAND_SZ /v "OneDrive" /d "%USERPROFILE%\OneDrive" /f
