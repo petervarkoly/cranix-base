@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) Peter Varkoly <peter@varkoly.de> All rights reserved.
+# Copyright (c) 2021 Peter Varkoly <pvarkoly@cephalix.eu> All rights reserved.
 from random import *
+import datetime
 import json
 import os
 
@@ -9,24 +10,32 @@ import os
 def read_birthday(bd):
     i_bd = bd.replace('.','-')
     l_bd = i_bd.replace(':','-').split('-')
+    y=""
+    m=""
+    d=""
     if( len(l_bd) != 3 ):
         lbd=len(bd)
-        y=""
-        m=""
-        d=""
         if lbd == 8:
             y=bd[:4]
             m=bd[4:6]
             d=bd[7:]
-            #TODO Test y m and d
-            return "{:4s}-{:0>2s}-{:0>2s}".format(y,m,d)
         else:
             raise SyntaxError("Bad birthday format:" + bd)
-    if(len(l_bd[0]) == 4 ):
-        return "{:4s}-{:0>2s}-{:0>2s}".format(l_bd[0],l_bd[1],l_bd[2])
-    if(len(l_bd[2]) == 4 ):
-        return "{:4s}-{:0>2s}-{:0>2s}".format(l_bd[2],l_bd[1],l_bd[0])
-    raise SyntaxError("Bad birthday format:" + bd)
+    elif(len(l_bd[0]) == 4 ):
+        y=l_bd[0]
+        m=l_bd[1]
+        d=l_bd[2]
+    elif(len(l_bd[2]) == 4 ):
+        y=l_bd[2]
+        m=l_bd[1]
+        d=l_bd[0]
+    else:
+        raise SyntaxError("Bad birthday format:" + bd)
+    try:
+        datetime.datetime(year=int(y),month=int(m),day=int(d))
+    except ValueError:
+        raise SyntaxError("Bad birthday format:" + bd)
+    return "{:4s}-{:0>2s}-{:0>2s}".format(y,m,d)
 
 def create_secure_pw(l):
     lenght= l-2
