@@ -9,4 +9,3 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Fold
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /t REG_EXPAND_SZ /v "AppData" /d "Z:\AppData" /f
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /t REG_EXPAND_SZ /v "OneDrive" /d "Z:\OneDrive" /f
 
-
