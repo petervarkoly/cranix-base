@@ -97,7 +97,10 @@ replace: givenname
 givenname: $givenname
 -
 replace: sn
-sn: $surname" > $FILE
+sn: $surname
+-
+replace: displayName
+displayName: $givenname $surname" > $FILE
 
 ldbmodify  -H /var/lib/samba/private/sam.ldb $FILE
 if [ $? != 0 ]; then
