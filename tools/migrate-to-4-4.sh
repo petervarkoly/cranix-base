@@ -31,13 +31,24 @@ fi
 zypper rl firewalld
 /usr/bin/zypper -n dup 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-4-4
 if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
+	. /etc/sysconfig/cranix
+	cp /etc/firewalld/firewalld.conf /etc/firewalld/firewalld.conf.orig
+	sed -i 's/DefaultZone=.*/DefaultZone=external/'         /etc/firewalld/firewalld.conf
+	sed -i 's/FirewallBackend=.*/FirewallBackend=iptables/' /etc/firewalld/firewalld.conf
+
         /usr/share/cranix/tools/sync-rooms-to-firewalld.py
-        EXTDEV=$( ip route | gawk '/default via/ { print $5 }' )
+	if [ $CRANIX_ISGATE = "yes" ]; then
+		EXTDEV=$( ip route | gawk '/default via/ { print $5 }' )
+		echo "## Enable forwarding."                  >  /etc/sysctl.d/cranix.conf
+		echo "net.ipv4.ip_forward = 1 "              >>  /etc/sysctl.d/cranix.conf
+		echo "net.ipv6.conf.all.forwarding = 1 "     >>  /etc/sysctl.d/cranix.conf
+		/usr/bin/firewall-offline-cmd --zone=external  --add-interface=$EXTDEV
+		/usr/bin/firewall-offline-cmd --zone=external --remove-masquerade
+	fi
         for i in $( ls /sys/devices/virtual/net/ | grep tun )
         do
                 /usr/bin/firewall-offline-cmd --zone=trusted  --add-interface=$i
         done
-        /usr/bin/firewall-offline-cmd --zone=external  --add-interface=$EXTDEV
         /usr/bin/systemctl start firewalld.service
         #Import outgoing rules:
         for i in $( cat /var/adm/cranix/migrate-4-4/outgoingRules.json |  jq --compact-output .[] )
@@ -45,6 +56,9 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
                 echo "$i" > /tmp/out.json
                 crx_api_post_file.sh system/firewall/outgoingRules /tmp/out.json
         done
+
+	#Adapt samba settings
+	/usr/share/cranix/tools/sync-cups-to-samba.py
 else
         echo "Migration failed"
 fi
