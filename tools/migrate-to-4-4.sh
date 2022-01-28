@@ -67,7 +67,7 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
 	cp /usr/share/cranix/setup/templates/nsswitch.conf  /etc/nsswitch.conf
 	chmod 600 /etc/sssd/sssd.conf
 	/usr/bin/systemctl enable sssd firewalld
-
+	
 else
         echo "Migration failed"
 fi
