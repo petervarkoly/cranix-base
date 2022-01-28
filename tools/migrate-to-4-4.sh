@@ -29,6 +29,7 @@ if [ ! -e /var/adm/cranix/migrate-4-4/outgoingRules.json ]; then
 fi
 /usr/bin/zypper ref
 zypper rl firewalld
+export LDAPBASE=$( crx_get_dn.sh ossreader | sed 's/dn: CN=ossreader,CN=Users,//' )
 /usr/bin/zypper -n dup 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-4-4
 if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
 	. /etc/sysconfig/cranix
@@ -42,7 +43,7 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
 		echo "## Enable forwarding."                  >  /etc/sysctl.d/cranix.conf
 		echo "net.ipv4.ip_forward = 1 "              >>  /etc/sysctl.d/cranix.conf
 		echo "net.ipv6.conf.all.forwarding = 1 "     >>  /etc/sysctl.d/cranix.conf
-		/usr/bin/firewall-offline-cmd --zone=external  --add-interface=$EXTDEV
+		/usr/bin/firewall-offline-cmd --zone=external --add-interface=$EXTDEV
 		/usr/bin/firewall-offline-cmd --zone=external --remove-masquerade
 	fi
         for i in $( ls /sys/devices/virtual/net/ | grep tun )
@@ -59,6 +60,14 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
 
 	#Adapt samba settings
 	/usr/share/cranix/tools/sync-cups-to-samba.py
+
+	#Setup sssd configuration
+	sed "s/###LDAPBASE###/$LDAPBASE/" /usr/share/cranix/setup/templates/sssd.conf > /etc/sssd/sssd.conf
+	sed -i "s/###WORKGROUP###/${CRANIX_WORKGROUP}/" /etc/sssd/sssd.conf
+	cp /usr/share/cranix/setup/templates/nsswitch.conf  /etc/nsswitch.conf
+	chmod 600 /etc/sssd/sssd.conf
+	/usr/bin/systemctl enable sssd firewalld
+
 else
         echo "Migration failed"
 fi
