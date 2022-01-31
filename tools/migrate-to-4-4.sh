@@ -33,9 +33,11 @@ export LDAPBASE=$( crx_get_dn.sh ossreader | sed 's/dn: CN=ossreader,CN=Users,//
 /usr/bin/zypper -n dup 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-4-4
 if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
 	. /etc/sysconfig/cranix
+	#Adapt firewall configuration
 	cp /etc/firewalld/firewalld.conf /etc/firewalld/firewalld.conf.orig
 	sed -i 's/DefaultZone=.*/DefaultZone=external/'         /etc/firewalld/firewalld.conf
 	sed -i 's/FirewallBackend=.*/FirewallBackend=iptables/' /etc/firewalld/firewalld.conf
+	sed -i "s/CRANIX_MONITOR_SERVICES=.*/CRANIX_MONITOR_SERVICES=\"${CRANIX_MONITOR_SERVICES} firewalld\"/" /etc/sysconfig/cranix
 
         /usr/share/cranix/tools/sync-rooms-to-firewalld.py
 	if [ $CRANIX_ISGATE = "yes" ]; then
@@ -57,6 +59,31 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
                 echo "$i" > /tmp/out.json
                 crx_api_post_file.sh system/firewall/outgoingRules /tmp/out.json
         done
+	#Importing incoming rules:
+	. /etc/sysconfig/SuSEfirewall2
+	for i in $FW_SERVICES_EXT_TCP;
+	do
+		if [ $i = 444 ]; then
+			/usr/bin/firewall-offline-cmd --zone=external --add-service=admin
+			echo "Enable admin service";
+		elif [[ ${i,,} == *[a-z] ]]; then
+			/usr/bin/firewall-offline-cmd --zone=external --add-service=${i,,}
+			echo "Enable $i service";
+		else
+			/usr/bin/firewall-offline-cmd --zone=external --add-port="${i}/tcp"
+			echo "Enable $i tcp port";
+		fi;
+	done
+	for i in $FW_SERVICES_EXT_UDP;
+	do
+		if [[ ${i,,} == *[a-z] ]]; then
+			/usr/bin/firewall-offline-cmd --zone=external --add-service=${i,,}
+			echo "Enable $i service";
+		else
+			/usr/bin/firewall-offline-cmd --zone=external --add-port="${i}/udp"
+			echo "Enable $i udp port";
+		fi;
+	done
 
 	#Adapt samba settings
 	/usr/share/cranix/tools/sync-cups-to-samba.py
