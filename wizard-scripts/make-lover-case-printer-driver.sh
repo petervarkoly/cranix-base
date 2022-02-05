@@ -12,7 +12,7 @@ done
 for i in $( lpc status | grep ':$' | sed 's/://' )
 do
 	#Check if this printer is in the DB
-	INDB=$( echo "select name from Printers where name='$i'" | mysql CRANIX )
+	INDB=$( echo "select name from Printers where name='$i'" | mysql CRX )
 	if [ -z "${INDB}" ]; then
 		continue
 	fi
