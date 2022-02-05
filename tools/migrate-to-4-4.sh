@@ -1,4 +1,5 @@
 #!/bin/bash
+. /etc/sysconfig/cranix
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
 if [ ! -e /var/adm/cranix/migrate-4-4/outgoingRules.json ]; then
         sed -i s#CRANIX/4.3#CRANIX/4.4# /etc/zypp/credentials.cat
@@ -18,15 +19,37 @@ if [ ! -e /var/adm/cranix/migrate-4-4/outgoingRules.json ]; then
         rsync -aAv /var/lib/printserver/drivers/ /var/lib/samba/drivers/
         /usr/bin/systemctl start samba-ad
 
-        EFOUND=$( gawk  '/CRANIX_PRINTSERVER/ { print NR } ' /etc/sysconfig/cranix )
-        if [ "${EFOUND}" ]; then
-                SFOUND=$((EFOUND-4))
-                sed -i "${SFOUND},${EFOUND}d" /etc/sysconfig/cranix
-        fi
-
         rpm -e --nodeps apparmor-parser
         rpm -e --nodeps apparmor-abstractions
+	rpm -e --nodeps yast2-apparmor
 fi
+
+#Ask if separate printserver should stay
+if [ -e /usr/lib/systemd/system/samba-printserver.service ]; then
+	echo ""
+	echo "#################################################################"
+	echo ""
+	echo -n "Möchten Sie die alte Printserverkonfigration behalten [j/n]";
+	read KEEPPRINT
+	if [ "${KEEPPRINT,,}" -ne "j" ] then
+		systemctl disable samba-printserver.service
+		mv /usr/lib/systemd/system/samba-printserver.service /var/adm/cranix/migrate-4-4/
+		EFOUND=$( gawk  '/CRANIX_PRINTSERVER/ { print NR } ' /etc/sysconfig/cranix )
+		if [ "${EFOUND}" ]; then
+			SFOUND=$((EFOUND-4))
+			sed -i "${SFOUND},${EFOUND}d" /etc/sysconfig/cranix
+		fi
+		/usr/sbin/crx_update_host.sh printserver ${CRANIX_PRINTSERVER} ${CRANIX_SERVER}
+		sed -i /printserver/d /etc/hosts
+		IFCFGPRINT=$( grep -l IPADDR_print /etc/sysconfig/network/ifcfg-* )
+		if [ "${IFCFGPRINT}" ]; then
+			cp ${IFCFGPRINT} /var/adm/cranix/migrate-4-4/
+			sed -i /IPADDR_print/d ${IFCFGPRINT}
+			sed -i /LABEL_print/d  ${IFCFGPRINT}
+		fi
+	fi
+fi
+
 /usr/bin/zypper ref
 zypper rl firewalld
 export LDAPBASE=$( crx_get_dn.sh ossreader | sed 's/dn: CN=ossreader,CN=Users,//' )
@@ -93,6 +116,10 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
 	sed -i "s/###WORKGROUP###/${CRANIX_WORKGROUP}/" /etc/sssd/sssd.conf
 	cp /usr/share/cranix/setup/templates/nsswitch.conf  /etc/nsswitch.conf
 	chmod 600 /etc/sssd/sssd.conf
+	PAMWINBIND=$( grep winbind /etc/pam.d/* )
+	if [ "${PAMWINBIND}" ]; then
+		pam-config --add --sss
+	fi
 	/usr/bin/systemctl enable sssd firewalld
 	/sbin/reboot	
 else
