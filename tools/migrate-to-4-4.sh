@@ -31,7 +31,7 @@ if [ -e /usr/lib/systemd/system/samba-printserver.service ]; then
 	echo ""
 	echo -n "Möchten Sie die alte Printserverkonfigration behalten [j/n]";
 	read KEEPPRINT
-	if [ "${KEEPPRINT,,}" -ne "j" ] then
+	if [ "${KEEPPRINT,,}" != "j" ]; then
 		systemctl disable samba-printserver.service
 		mv /usr/lib/systemd/system/samba-printserver.service /var/adm/cranix/migrate-4-4/
 		EFOUND=$( gawk  '/CRANIX_PRINTSERVER/ { print NR } ' /etc/sysconfig/cranix )
