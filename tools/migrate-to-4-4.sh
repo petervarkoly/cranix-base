@@ -80,7 +80,7 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
         #Import outgoing rules:
         for i in $( cat /var/adm/cranix/migrate-4-4/outgoingRules.json |  jq --compact-output .[] )
         do
-                echo "$i" > /tmp/out.json
+                echo "$i" | sed 's/prot/protocol/' > /tmp/out.json
                 crx_api_post_file.sh system/firewall/outgoingRules /tmp/out.json
         done
 	#Importing incoming rules:
