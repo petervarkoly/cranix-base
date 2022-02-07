@@ -1,6 +1,7 @@
 #!/bin/bash
 . /etc/sysconfig/cranix
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
+sed -i 's/solver.dupAllowVendorChange.*/solver.dupAllowVendorChange = true/' /etc/zypp/zypp.conf
 if [ ! -e /var/adm/cranix/migrate-4-4/outgoingRules.json ]; then
         sed -i s#CRANIX/4.3#CRANIX/4.4# /etc/zypp/credentials.cat
         sed -i s/4.3/4.4/ /etc/zypp/repos.d/CRANIX.repo
