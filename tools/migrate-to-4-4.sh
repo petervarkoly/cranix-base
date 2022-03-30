@@ -9,46 +9,9 @@ if [ ! -e /var/adm/cranix/migrate-4-4/outgoingRules.json ]; then
         mkdir -p /var/adm/cranix/migrate-4-4
         crx_api.sh GET system/firewall/outgoingRules > /var/adm/cranix/migrate-4-4/outgoingRules.json
 
-        /usr/bin/systemctl stop samba-ad samba-printserver cron
-        cp /var/lib/samba/registry.tdb /var/lib/samba/registry.tdb-${DATE}
-        cp /var/lib/printserver/registry.tdb /var/lib/printserver/registry.tdb-${DATE}
-
-        #Merge printserver into admin
-        /usr/share/cranix/tools/merge-registry.py  >  /var/adm/cranix/migrate-4-4/new-registry
-        mv /var/lib/samba/registry.tdb /var/adm/cranix/migrate-4-4/
-        cat /var/adm/cranix/migrate-4-4/new-registry | /usr/bin/tdbrestore /var/lib/samba/registry.tdb
-        rsync -aAv /var/lib/printserver/drivers/ /var/lib/samba/drivers/
-        /usr/bin/systemctl start samba-ad
-
         rpm -e --nodeps apparmor-parser
         rpm -e --nodeps apparmor-abstractions
 	rpm -e --nodeps yast2-apparmor
-fi
-
-#Ask if separate printserver should stay
-if [ -e /usr/lib/systemd/system/samba-printserver.service ]; then
-	echo ""
-	echo "#################################################################"
-	echo ""
-	echo -n "Möchten Sie die alte Printserverkonfigration behalten [j/n]";
-	read KEEPPRINT
-	if [ "${KEEPPRINT,,}" != "j" ]; then
-		systemctl disable samba-printserver.service
-		mv /usr/lib/systemd/system/samba-printserver.service /var/adm/cranix/migrate-4-4/
-		EFOUND=$( gawk  '/CRANIX_PRINTSERVER/ { print NR } ' /etc/sysconfig/cranix )
-		if [ "${EFOUND}" ]; then
-			SFOUND=$((EFOUND-4))
-			sed -i "${SFOUND},${EFOUND}d" /etc/sysconfig/cranix
-		fi
-		/usr/sbin/crx_update_host.sh printserver ${CRANIX_PRINTSERVER} ${CRANIX_SERVER}
-		sed -i /printserver/d /etc/hosts
-		IFCFGPRINT=$( grep -l IPADDR_print /etc/sysconfig/network/ifcfg-* )
-		if [ "${IFCFGPRINT}" ]; then
-			cp ${IFCFGPRINT} /var/adm/cranix/migrate-4-4/
-			sed -i /IPADDR_print/d ${IFCFGPRINT}
-			sed -i /LABEL_print/d  ${IFCFGPRINT}
-		fi
-	fi
 fi
 
 /usr/bin/zypper ref
@@ -113,6 +76,11 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
 	/usr/share/cranix/tools/sync-cups-to-samba.py
 
 	#Setup sssd configuration
+	ldapServer=$( grep 'ldap server require' /etc/samba/smb.conf )
+	if [ -z "${ldapServer}" ]; then
+		sed -i '/\[global\]/a ldap server require strong auth = no' /etc/samba/smb.conf
+	fi
+
 	sed "s/###LDAPBASE###/$LDAPBASE/" /usr/share/cranix/setup/templates/sssd.conf > /etc/sssd/sssd.conf
 	sed -i "s/###WORKGROUP###/${CRANIX_WORKGROUP}/" /etc/sssd/sssd.conf
 	cp /usr/share/cranix/setup/templates/nsswitch.conf  /etc/nsswitch.conf
