@@ -89,6 +89,7 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "4.4" ]; then
 	if [ "${PAMWINBIND}" ]; then
 		pam-config --add --sss
 	fi
+	/usr/bin/rpm -e SuSEfirewall2	
 	/usr/bin/systemctl enable sssd firewalld
 	/sbin/reboot	
 else
