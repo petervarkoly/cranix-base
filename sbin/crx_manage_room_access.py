@@ -208,7 +208,7 @@ def get_state():
 
 def prepare_room():
     global room
-    room['name'] = room['name'].strip()
+    room['name'] = room['name'].strip()[0:17]
     room['network']='{0}/{1}'.format(room['startIP'],room['netMask'])
     room['printers'] = []
     if room['defaultPrinter']:

@@ -12,11 +12,12 @@ for line in os.popen('/usr/bin/firewall-offline-cmd --list-all-zones').readlines
         zones.append(match1.group(1))
 
 for room in json.load(os.popen('crx_api.sh GET rooms/all')):
-    if room['name'].strip() not in zones:
-        os.system('/usr/bin/firewall-offline-cmd --new-zone={0}'.format(room['name']))
-        os.system('/usr/bin/firewall-offline-cmd --zone={0} --set-description="Zone for Room {0}"'.format(room['name']))
-        os.system('/usr/bin/firewall-offline-cmd --zone={0} --add-source="{1}/{2}"'.format(room['name'],room['startIP'],room['netMask']))
-        os.system('/usr/bin/firewall-offline-cmd --zone={0} --set-target=ACCEPT'.format(room['name']))
+    roomName = room['name'].strip()[0:17]
+    if roomName not in zones:
+        os.system('/usr/bin/firewall-offline-cmd --new-zone={0}'.format(roomName))
+        os.system('/usr/bin/firewall-offline-cmd --zone={0} --set-description="Zone for Room {0}"'.format(roomName))
+        os.system('/usr/bin/firewall-offline-cmd --zone={0} --add-source="{1}/{2}"'.format(roomName,room['startIP'],room['netMask']))
+        os.system('/usr/bin/firewall-offline-cmd --zone={0} --set-target=ACCEPT'.format(roomName))
         to_reload = True
 if to_reload:
     os.system('/usr/bin/firewall-cmd --reload')
