@@ -19,7 +19,7 @@ subprocess.run(['/usr/sbin/lpadmin','-p',printer['name'],
                '-v','socket://{0}'.format(printer['hostName'])])
 
 #Add printer to samba
-config = configparser.ConfigParser(delimiters=('='))
+config = configparser.ConfigParser(delimiters=('='), strict=False)
 config.read('/etc/samba/smb-printserver.conf')
 
 if not printer['name'] in config:

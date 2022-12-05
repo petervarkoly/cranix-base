@@ -48,8 +48,8 @@ server_net = cranixconfig.CRANIX_SERVER_NET
 proxy  = cranixconfig.CRANIX_PROXY
 portal = cranixconfig.CRANIX_MAILSERVER
 debug  = cranixconfig.CRANIX_DEBUG == "yes"
-config = configparser.ConfigParser(delimiters=('='))
-printc = configparser.ConfigParser(delimiters=('='))
+config = configparser.ConfigParser(delimiters=('='), strict=False)
+printc = configparser.ConfigParser(delimiters=('='), strict=False)
 printc_changed = False #Rewrite of samba is required
 smb_reload  = False #Reload of samba is required
 debug_file  = '/var/log/cranix-manage-room.log'

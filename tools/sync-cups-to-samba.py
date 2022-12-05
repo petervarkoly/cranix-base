@@ -23,7 +23,7 @@ os.system('chgrp -R "SYSADMINS" /var/lib/printserver/drivers')
 os.system('chmod -R 2775 /var/lib/printserver/drivers')
 os.system('net rpc rights grant "BUILTIN\Administrators" SePrintOperatorPrivilege -U "register%{0}"'.format(passwd))
 os.system('net rpc rights grant "SYSADMINS" SePrintOperatorPrivilege -U "register%{0}"'.format(passwd))
-config = configparser.ConfigParser(delimiters=('='))
+config = configparser.ConfigParser(delimiters=('='), strict=False)
 config.read(print_config_file)
 
 config.set('global','printing','CUPS')
