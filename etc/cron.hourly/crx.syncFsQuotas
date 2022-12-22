@@ -7,6 +7,7 @@ import os
 import sys
 
 quotas=[]
+overquota=[]
 users=json.load(os.popen('/usr/sbin/crx_api.sh GET users/all'))
 for user in users:
     quota=os.popen('LANG=EN_en /usr/bin/quota -w {0} 2>/dev/null | /usr/bin/tail -n1 | /usr/bin/sed "s/*//" '.format(user['uid'])).read().split()
@@ -16,7 +17,9 @@ for user in users:
         quotas.append([user['uid'],0,0,0])
     else:
         quotas.append([user['uid'],int(int(quota[1])/1024),int(int(quota[2])/1024),int(int(quota[3])/1024)])
-with open("/tmp/quotalist","w") as f:
+with open("/run/quotalist","w") as f:
     json.dump(quotas, f)
-os.system('/usr/sbin/crx_api_post_file.sh users/syncFsQuotas /tmp/quotalist >/dev/null')
+with open("/run/overquota","w") as f:
+    f.write(" ".join(overquota))
+os.system('/usr/sbin/crx_api_post_file.sh users/syncFsQuotas /run/quotalist >/dev/null')
 
