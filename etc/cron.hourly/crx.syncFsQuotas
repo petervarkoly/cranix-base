@@ -17,6 +17,8 @@ for user in users:
         quotas.append([user['uid'],0,0,0])
     else:
         quotas.append([user['uid'],int(int(quota[1])/1024),int(int(quota[2])/1024),int(int(quota[3])/1024)])
+        if int(quota[1]) > int(quota[2]):
+            overquota.append(user['uid'])
 with open("/run/quotalist","w") as f:
     json.dump(quotas, f)
 with open("/run/overquota","w") as f:
