@@ -20,7 +20,7 @@ os.system('/usr/bin/systemctl restart samba-ad')
 if os.path.exists(print_config_file):
     config = configparser.ConfigParser(delimiters=('='), interpolation=None, strict=False)
     config.read(print_config_file)
-    config.set('global','ncalrpc dir','/run/sambafileserver/ncalrpc')
+    config.set('global','ncalrpc dir','/run/sambaprintserver/ncalrpc')
     with open(print_config_file,'w') as f:
         config.write(f)
     os.system('/usr/bin/systemctl restart samba-printserver')
