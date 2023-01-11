@@ -23,6 +23,7 @@ security = ADS
 bind interfaces only = yes
 interfaces = {2}
 pid   directory = /run/sambafileserver
+ncalrpc dir = /run/sambafileserver/ncalrpc
 cache directory = /var/lib/fileserver
 lock  directory = /var/lib/fileserver/lock
 state directory = /var/lib/fileserver
