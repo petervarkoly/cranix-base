@@ -74,10 +74,6 @@ chown -R $TO "${IMPORT}/${PROJECT}"
 
 if [ "$CLEANUP" = 'y' ]; then
     rm -rf $EXPORT/*
-    role=$( crx_api_text.sh GET users/byUid/${FROM}/role )
-    if [ "${role}" != "teachers" -a "${role}" ]; then
-        rm -rf ${USERHOME}/Import/*
-    fi
 fi
 
 echo $COUNT
