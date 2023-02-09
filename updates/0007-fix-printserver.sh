@@ -10,7 +10,7 @@ IPPRSQL=$( echo  "select IP from Devices where name='printserver'" | mysql CRX |
 NEXTIP=$( crx_api.sh GET rooms/1/availableIPAddresses | jq .[1] | sed 's/"//g' )
 DEVINT=$( grep -l $CRANIX_SERVER /etc/sysconfig/network/ifcfg-* )
 
-/usr/bin/systemctl restart samba-ad
+/usr/bin/systemctl restart samba-ad-dc
 sleep 3
 if [ -z "${IPPRSQL}" ]
 then

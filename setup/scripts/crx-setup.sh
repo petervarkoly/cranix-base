@@ -142,8 +142,8 @@ function SetupSamba (){
 
     ########################################################################
     log " - Start samba service"
-    /usr/bin/systemctl enable samba-ad.service
-    /usr/bin/systemctl restart samba-ad.service
+    /usr/bin/systemctl enable samba-ad-dc.service
+    /usr/bin/systemctl restart samba-ad-dc.service
 
     ########################################################################
     log " - Setup samba private krbconf to kerberos conf"
@@ -239,7 +239,7 @@ profilePath: \\\\fileserver\\profiles\\administrator
     chown root:chrony /var/lib/samba/ntp_signd/
     chmod 750         /var/lib/samba/ntp_signd/
 
-    /usr/bin/systemctl restart samba-ad
+    /usr/bin/systemctl restart samba-ad-dc
     sleep 5
 
     ########################################################################
@@ -298,7 +298,7 @@ function SetupFileserver () {
     sed -i "s/#IPADDR#/$CRANIX_FILESERVER/g"    /etc/samba/smb-fileserver.conf
     sed -i "s/#CRANIX_DOMAIN#/$CRANIX_DOMAIN/g" /etc/samba/smb-fileserver.conf
     sed -i "s#HOMEBASE#$CRANIX_HOME_BASE#g"     /etc/samba/smb-fileserver.conf
-    systemctl restart samba-ad
+    systemctl restart samba-ad-dc
     sleep 1
     if [ "$passwd" ]; then
         net ADS JOIN -s /etc/samba/smb-fileserver.conf -U Administrator%"$passwd"
