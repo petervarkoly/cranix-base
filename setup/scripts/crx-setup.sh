@@ -556,6 +556,7 @@ chmod 600 /root/.my.cnf
         /usr/bin/systemctl start cranix-api
     fi
     /usr/share/cranix/tools/wait-for-api.sh
+    /opt/cranix-java/data/updates/022-add-subjects.sh
 }
 
 function PostSetup (){
