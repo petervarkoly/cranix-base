@@ -129,7 +129,7 @@ with open(files_config_file,'w') as f:
     filesc.write(f)
 
 print('Now the new server is joining the domain')
-os.system('/usr/bin/systemctl restart samba-ad')
+os.system('/usr/bin/systemctl restart samba-ad-dc')
 time.sleep(3)
 os.system('mkdir -p /var/log/samba/fileserver/')
 os.system('mkdir -p /var/lib/fileserver/{drivers,lock,printing,private}')

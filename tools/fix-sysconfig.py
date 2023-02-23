@@ -7,7 +7,7 @@ from configobj import ConfigObj
 # new services to add
 new_services = (
         'chronyd',
-        'samba-ad',
+        'samba-ad-dc',
         'samba-fileserver',
         'samba-printserver',
         'cranix-api',
