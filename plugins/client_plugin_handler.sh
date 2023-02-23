@@ -11,7 +11,11 @@ then
  for i in `find -mindepth 1 -maxdepth 1 | sort`
  do
    if [ "${what}" == "start" ]; then
-     echo "/usr/share/cranix/plugins/clients/$what/$i $client" | /usr/bin/batch
+     if [ ${CRANIX_DEBUG,,} == "yes" ]; then
+       echo "/usr/share/cranix/plugins/clients/$what/$i $client" | /usr/bin/at -b
+     else
+       echo "/usr/share/cranix/plugins/clients/$what/$i $client" | /usr/bin/at -b -M
+     fi
    else
      /usr/share/cranix/plugins/clients/$what/$i $client
    fi

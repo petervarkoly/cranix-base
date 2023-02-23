@@ -170,6 +170,8 @@ def set_state():
         if not args.let_direct:
             if allow_direct and network not in zones['external']['rule']:
                 #fw_changed = True
+                for rule in zones[key]['richRules']:
+                    os.system('/usr/bin/firewall-cmd --zone="external" --remove-rich-rule="{0}" &>/dev/null'.format(rule))
                 os.system('/usr/bin/firewall-cmd --zone="external" --add-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(network))
                 log_debug('/usr/bin/firewall-cmd --zone="external" --add-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(network))
             if not allow_direct and  network in zones['external']['rule']:
@@ -247,13 +249,17 @@ for line in os.popen('/usr/bin/firewall-cmd --list-all-zones').readlines():
     if match1:
         key = match1.group(1)
         zones[key] = {}
+        zones[key]['rule'] = []
+        zones[key]['richRules'] = []
         rule = False
     elif match2:
         rule = True
-        zones[key]['rule'] = []
     elif match3:
         zones[key][match3.group(1)] = match3.group(2)
     elif rule:
+        match4 = re.search('(rule.*destination address=.*)',line)
+        if match4:
+            zones[key]['richRules'].append(match4.group(1))
         match4 = re.search('address="([0-9\./]+)"',line)
         if match4:
             zones[key]['rule'].append(match4.group(1))
