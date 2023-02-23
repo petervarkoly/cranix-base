@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2023 Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 user=$1
 quota=$2
 

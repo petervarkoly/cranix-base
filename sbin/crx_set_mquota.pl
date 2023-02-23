@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# Copyright (c) 2023 Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 use Mail::IMAPClient;
 use strict;
 my $user  = shift;

@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2023 Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 group=$1
 CRANIX_HOME_BASE="/home"
 . /etc/sysconfig/cranix

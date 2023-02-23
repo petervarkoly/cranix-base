@@ -1,4 +1,5 @@
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
+# Copyright (c) 2023 Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 . /etc/profile.d/profile.sh
 #Restart all processes which have deleted files
 systemctl restart $( zypper ps --print "%s" )
