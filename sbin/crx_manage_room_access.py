@@ -295,7 +295,7 @@ else:
             config.set('global','hosts deny'," ".join(login_denied_rooms))
         with open('/etc/samba/smb.conf','wt') as f:
             config.write(f)
-        os.system("/usr/bin/systemctl reload samba-ad-dc.service")
+        os.system("/usr/bin/systemctl reload samba-ad.service")
     if printc_changed:
         with open(print_config_file,'wt') as f:
             printc.write(f)

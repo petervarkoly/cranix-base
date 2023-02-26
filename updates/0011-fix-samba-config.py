@@ -15,7 +15,7 @@ config.set('global','printcap name','/dev/null')
 config.set('global','disable spoolss','yes')
 with open(samba_config_file,'w') as f:
     config.write(f)
-os.system('/usr/bin/systemctl restart samba-ad-dc')
+os.system('/usr/bin/systemctl restart samba-ad')
 
 if os.path.exists(print_config_file):
     config = configparser.ConfigParser(delimiters=('='), interpolation=None, strict=False)

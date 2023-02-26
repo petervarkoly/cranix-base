@@ -3,7 +3,7 @@ Description=Samba Fileserver Daemon
 Documentation=man:samba(8) man:samba(7) man:smb.conf(5)
 Wants=network-online.target
 After=network.target network-online.target
-PartOf=samba-ad-dc.service
+PartOf=samba-ad.service
 
 [Service]
 Type=notify
