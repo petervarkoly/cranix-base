@@ -542,7 +542,12 @@ chmod 600 /root/.my.cnf
     sed -i s/MYSQLPWD/$password/ /opt/cranix-java/conf/cranix-api.properties
     sed -i s/CRANIX_NETBIOSNAME/${CRANIX_NETBIOSNAME}/ /opt/cranix-java/conf/cranix-api.properties
     /usr/bin/systemctl restart  mysql
-    sleep 2
+    if [ "$CRANIX_TYPE" = "cephalix"  ]; then
+        /usr/bin/systemctl restart cephalix-api
+    else
+        /usr/bin/systemctl restart cranix-api
+    fi
+    sleep 3
 
     ########################################################################
     if [ ! -e /etc/ssl/servercerts/cacert.pem ]; then
@@ -551,11 +556,6 @@ chmod 600 /root/.my.cnf
 	/usr/share/cranix/tools/create_server_certificates.sh -N admin
 	/usr/share/cranix/tools/create_server_certificates.sh -N cranix
 	/usr/share/cranix/tools/create_server_certificates.sh -N proxy
-    fi
-    if [ "$CRANIX_TYPE" = "cephalix"  ]; then
-        /usr/bin/systemctl start cephalix-api
-    else
-        /usr/bin/systemctl start cranix-api
     fi
     /usr/share/cranix/tools/wait-for-api.sh
     /opt/cranix-java/data/updates/022-add-subjects.sh
