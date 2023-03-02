@@ -541,6 +541,8 @@ chmod 600 /root/.my.cnf
 
     sed -i s/MYSQLPWD/$password/ /opt/cranix-java/conf/cranix-api.properties
     sed -i s/CRANIX_NETBIOSNAME/${CRANIX_NETBIOSNAME}/ /opt/cranix-java/conf/cranix-api.properties
+    /usr/bin/systemctl restart  mysql
+    sleep 2
 
     ########################################################################
     if [ ! -e /etc/ssl/servercerts/cacert.pem ]; then
