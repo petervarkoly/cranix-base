@@ -8,7 +8,7 @@ sed -i s/4.4/4.5/ /etc/zypp/repos.d/CRANIX.repo
 sed -i /repo1.cephalix.eu/d /etc/hosts
 host repo1.cephalix.eu | gawk '{ print $4 " repo1.cephalix.eu vpn.cephalix.eu" }' >> /etc/hosts
 CEPHALIX_VPN=$( gawk '/^remote/ { print $2 }' /etc/openvpn/CEPHALIX.conf )
-if [ ${CEPHALIX_VPN} != vpn.cephalix.eu ]; then
+if [ -n "${CEPHALIX_VPN}" -a "${CEPHALIX_VPN}" != "vpn.cephalix.eu" ]; then
 	sed -i /${CEPHALIX_VPN}/d /etc/hosts
 	host ${CEPHALIX_VPN} | gawk '{ print $4 " " $1 }' >> /etc/hosts
 fi
