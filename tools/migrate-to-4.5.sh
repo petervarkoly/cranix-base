@@ -5,6 +5,9 @@ sed -i s#CRANIX/4.4#CRANIX/4.5# /etc/zypp/credentials.cat
 sed -i s/4.4/4.5/ /etc/zypp/repos.d/CRANIX.repo
 /usr/bin/zypper ref
 #To be safe if samba will not start after update.
+sed -i 's/solver.dupAllowVendorChange = .*/solver.dupAllowVendorChange = true/' /etc/zypp/zypp.conf
+sed -i 's/^net.ipv4.ip_forward/#net.ipv4.ip_forward/'  /etc/sysctl.conf
+sed -i 's/^net.ipv6.conf.all.forwarding/#net.ipv6.conf.all.forwarding/'  /etc/sysctl.conf
 sed -i /repo1.cephalix.eu/d /etc/hosts
 host repo1.cephalix.eu | gawk '{ print $4 " repo1.cephalix.eu vpn.cephalix.eu" }' >> /etc/hosts
 CEPHALIX_VPN=$( gawk '/^remote/ { print $2 }' /etc/openvpn/CEPHALIX.conf )
