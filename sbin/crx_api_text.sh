@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2023 Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 # Copyright 2017 Peter Varkoly <peter@varkoly.de>
 
 METHOD=$1

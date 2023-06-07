@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# Copyright (c) 2023 Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 
 import configparser
 import json
@@ -48,8 +49,8 @@ server_net = cranixconfig.CRANIX_SERVER_NET
 proxy  = cranixconfig.CRANIX_PROXY
 portal = cranixconfig.CRANIX_MAILSERVER
 debug  = cranixconfig.CRANIX_DEBUG == "yes"
-config = configparser.ConfigParser(delimiters=('='))
-printc = configparser.ConfigParser(delimiters=('='))
+config = configparser.ConfigParser(delimiters=('='), strict=False)
+printc = configparser.ConfigParser(delimiters=('='), strict=False)
 printc_changed = False #Rewrite of samba is required
 smb_reload  = False #Reload of samba is required
 debug_file  = '/var/log/cranix-manage-room.log'
@@ -170,6 +171,8 @@ def set_state():
         if not args.let_direct:
             if allow_direct and network not in zones['external']['rule']:
                 #fw_changed = True
+                for rule in zones[key]['richRules']:
+                    os.system('/usr/bin/firewall-cmd --zone="external" --remove-rich-rule="{0}" &>/dev/null'.format(rule))
                 os.system('/usr/bin/firewall-cmd --zone="external" --add-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(network))
                 log_debug('/usr/bin/firewall-cmd --zone="external" --add-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(network))
             if not allow_direct and  network in zones['external']['rule']:
@@ -208,7 +211,7 @@ def get_state():
 
 def prepare_room():
     global room
-    room['name'] = room['name'].strip()
+    room['name'] = room['name'].strip()[0:17]
     room['network']='{0}/{1}'.format(room['startIP'],room['netMask'])
     room['printers'] = []
     if room['defaultPrinter']:
@@ -247,13 +250,17 @@ for line in os.popen('/usr/bin/firewall-cmd --list-all-zones').readlines():
     if match1:
         key = match1.group(1)
         zones[key] = {}
+        zones[key]['rule'] = []
+        zones[key]['richRules'] = []
         rule = False
     elif match2:
         rule = True
-        zones[key]['rule'] = []
     elif match3:
         zones[key][match3.group(1)] = match3.group(2)
     elif rule:
+        match4 = re.search('(rule.*destination address=.*)',line)
+        if match4:
+            zones[key]['richRules'].append(match4.group(1))
         match4 = re.search('address="([0-9\./]+)"',line)
         if match4:
             zones[key]['rule'].append(match4.group(1))

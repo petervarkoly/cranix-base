@@ -38,7 +38,7 @@ if printer['action'] == 'activateWindowsDriver':
         ])
 
 elif printer['action'] == 'enable':
-    config = configparser.ConfigParser(delimiters=('='))
+    config = configparser.ConfigParser(delimiters=('='), strict=False)
     config.read(config_file)
     allowed_rooms = config.get(printer['name'],'hosts allow').split()
     if printer['network'] not in allowed_rooms:
@@ -49,7 +49,7 @@ elif printer['action'] == 'enable':
         subprocess.run(['/usr/bin/systemctl','restart','samba-printserver'])
 
 elif printer['action'] == 'disable':
-    config = configparser.ConfigParser(delimiters=('='))
+    config = configparser.ConfigParser(delimiters=('='), strict=False)
     config.read(config_file)
     allowed_rooms = config.get(printer['name'],'hosts allow').split()
     if printer['network'] in allowed_rooms:

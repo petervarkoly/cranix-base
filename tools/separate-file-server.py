@@ -23,6 +23,7 @@ security = ADS
 bind interfaces only = yes
 interfaces = {2}
 pid   directory = /run/sambafileserver
+ncalrpc dir = /run/sambafileserver/ncalrpc
 cache directory = /var/lib/fileserver
 lock  directory = /var/lib/fileserver/lock
 state directory = /var/lib/fileserver
@@ -96,9 +97,9 @@ os.system('/usr/sbin/crx_add_host.sh {0} {1}'.format('fileserver',next_ip))
 
 #Remove with spaces from the keys.
 os.system("sed -i -E 's/^[[:space:]]+//g' {0}".format(samba_config_file))
-config = configparser.ConfigParser(delimiters=('='),interpolation=None,strict=False)
+config = configparser.ConfigParser(delimiters=('='), interpolation=None, strict=False)
 config.read(samba_config_file)
-filesc = configparser.ConfigParser(delimiters=('='),interpolation=None)
+filesc = configparser.ConfigParser(delimiters=('='), interpolation=None, strict=False)
 if os.path.exists(files_config_file):
     filesc.read(files_config_file)
 else:

@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2023 Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 #
 # Copyright (c) 2017 Peter Varkoly <peter@varkoly.de> Nürnberg, Germany.  All rights reserved.
 #
@@ -74,10 +75,6 @@ chown -R $TO "${IMPORT}/${PROJECT}"
 
 if [ "$CLEANUP" = 'y' ]; then
     rm -rf $EXPORT/*
-    role=$( crx_api_text.sh GET users/byUid/${FROM}/role )
-    if [ "${role}" != "teachers" -a "${role}" ]; then
-        rm -rf ${USERHOME}/Import/*
-    fi
 fi
 
 echo $COUNT
