@@ -14,7 +14,7 @@ then
      if [ ${CRANIX_DEBUG,,} == "yes" ]; then
        echo "/usr/share/cranix/plugins/clients/$what/$i $client" | /usr/bin/at -b
      else
-       echo "/usr/share/cranix/plugins/clients/$what/$i $client" | /usr/bin/at -bM
+       echo "/usr/share/cranix/plugins/clients/$what/$i $client" | /usr/bin/at -Mb
      fi
    else
      /usr/share/cranix/plugins/clients/$what/$i $client
