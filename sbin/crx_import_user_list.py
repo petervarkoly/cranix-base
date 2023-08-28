@@ -63,7 +63,7 @@ for ident in cranix.import_list:
     else:
         new_classes = new_user['classes'].split()
     if ident in cranix.all_users:
-    # It is an old user
+        # It is an old user
         old_user = cranix.all_users[ident]
         cranix.log_debug("Old user",old_user)
         new_user['id']  = old_user['id']
