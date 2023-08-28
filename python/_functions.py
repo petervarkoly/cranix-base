@@ -2,10 +2,11 @@
 
 # Copyright (c) 2021 Peter Varkoly <pvarkoly@cephalix.eu> All rights reserved.
 from random import *
+from subprocess import run, PIPE
 import datetime
-import json
-import os
+import re
 
+valid_uid = re.compile(r"^[a-zA-Z0-9]+[a-zA-Z0-9\.\-\_]*[a-zA-Z0-9]$")
 
 def read_birthday(bd):
     i_bd = bd.replace('.','-')
@@ -61,6 +62,31 @@ def create_secure_pw(l):
 def print_error(msg):
     return '<font color="red">{0}</font></br>\n'.format(msg)
 
-def print_msg(title,msg):
+def print_msg(title, msg):
     return '<b>{0}</b>{1}</br>\n'.format(title,msg)
+
+def check_uid(uid: str):
+    if len(uid) < 2:
+        return "UID must contains at last 2 characters"
+    if len(uid) > 64:
+        return "UID must not contains more then 64 characters"
+    if not valid_uid.match(uid):
+        return "UID contains invalid chracter."
+    if not uid.isprintable():
+        return "UID must contain only ascii printable chracters"
+    p = run(["/usr/bin/id",uid], stdout=PIPE, stderr=PIPE)
+    if p.returncode == 0:
+        return "uid '{}' is not unique".format(uid)
+    return ""
+
+def check_password(password):
+    try:
+        p = run("/usr/share/cranix/tools/check_password_complexity.sh", stdout=PIPE,  stderr=PIPE, input=password, encoding='ascii')
+    except UnicodeEncodeError:
+        print("Password not ascii")
+    else:
+        if p.stdout != "":
+            (a,b) = p.stdout.split("##")
+            return a.replace('%s','{}').format(b.strip())
+    return ""
 

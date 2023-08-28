@@ -1,13 +1,8 @@
 #!/usr/bin/python3
 # Copyright (c) 2023 Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 
-import json
 import os
-import sys
-import time
-import shutil
 import cranix
-from configobj import ConfigObj
 from argparse import ArgumentParser
 
 parser = ArgumentParser()
@@ -45,6 +40,15 @@ parser.add_argument("--cleanClassDirs", dest="cleanClassDirs", default=False, ac
 args = parser.parse_args()
 # Init the import envinroment
 cranix.init(args)
+
+
+# First w remove students which have las the school.
+if args.full and args.role == 'students':
+    for ident in cranix.all_users:
+        if not ident in cranix.import_list and not cranix.all_users[ident]['uid'] in cranix.protected_users:
+            cranix.log_msg(ident,"User will be deleted")
+            if not args.test:
+                cranix.delete_user(cranix.all_users[ident]['uid'])
 
 # Now we proceed the user list
 for ident in cranix.import_list:
@@ -88,6 +92,17 @@ for ident in cranix.import_list:
         if not args.test:
             if not cranix.add_user(new_user,ident):
                 continue
+        else:
+            # Test if uid and password are ok if given
+            if 'uid' in new_user:
+                res = cranix.check_uid(new_user['uid'])
+                if len(res) > 0:
+                    cranix.log_error(res)
+            if 'password' in new_user:
+                res = cranix.check_password(new_user['password'])
+                if len(res) > 0:
+                    cranix.log_error(res)
+
     #trate classes
     for cl in new_classes:
         if cl == '' or cl.isspace():
@@ -127,13 +142,6 @@ if not args.test:
 if not args.test and args.cleanClassDirs:
     for c in cranix.existing_classes:
         os.system('/usr/sbin/crx_clean_group_directory.sh "{0}"'.format(c.upper()))
-
-if args.full and args.role == 'students':
-    for ident in cranix.all_users:
-        if not ident in cranix.import_list and not cranix.all_users[ident]['uid'] in cranix.protected_users:
-            cranix.log_msg(ident,"User will be deleted")
-            if not args.test:
-                cranix.delete_user(cranix.all_users[ident]['uid'])
 
 if args.allClasses:
    for c in cranix.existing_classes:
