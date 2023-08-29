@@ -68,12 +68,10 @@ def print_msg(title, msg):
 def check_uid(uid: str):
     if len(uid) < 2:
         return "UID must contains at last 2 characters"
-    if len(uid) > 64:
-        return "UID must not contains more then 64 characters"
+    if len(uid) > 32:
+        return "UID must not contains more then 32 characters"
     if not valid_uid.match(uid):
         return "UID contains invalid chracter."
-    if not uid.isprintable():
-        return "UID must contain only ascii printable chracters"
     p = run(["/usr/bin/id",uid], stdout=PIPE, stderr=PIPE)
     if p.returncode == 0:
         return "uid '{}' is not unique".format(uid)

@@ -3,6 +3,10 @@
 . /etc/sysconfig/cranix
 
 read pw2check
+if [ -z "$pw2check" ]; then
+	echo "User password must not be empty"
+	exit 6
+fi
 if [[ $pw2check =~ [\&§] ]]; then
 	echo "User password must not contain this chracters: &§"
 	exit 6
@@ -63,12 +67,6 @@ if [[ $pw2check =~ [[:digit:]] ]]; then
 	a=1
 else
 	echo "User password must contain digits."
-	exit 5
-fi
-if [ $pw2check = ${pw2check/&/} ]; then
-	a=1
-else
-	echo "User password must not contains '&'."
 	exit 5
 fi
 

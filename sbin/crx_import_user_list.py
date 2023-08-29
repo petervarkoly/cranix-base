@@ -98,7 +98,7 @@ for ident in cranix.import_list:
                 res = cranix.check_uid(new_user['uid'])
                 if len(res) > 0:
                     cranix.log_error(res)
-            if 'password' in new_user:
+            if 'password' in new_user and new_user['password'] != "":
                 res = cranix.check_password(new_user['password'])
                 if len(res) > 0:
                     cranix.log_error(res)
