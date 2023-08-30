@@ -38,7 +38,4 @@ done
 /usr/bin/firewall-cmd --permanent --zone=${name} --set-description="Zone for Room ${name}"
 /usr/bin/firewall-cmd --permanent --zone=${name} --add-source="${startip}/${netmask}"
 /usr/bin/firewall-cmd --permanent --zone=${name} --set-target=ACCEPT
-/usr/bin/firewall-cmd --new-zone=${name}
-/usr/bin/firewall-cmd --zone=${name} --set-description="Zone for Room ${name}"
-/usr/bin/firewall-cmd --zone=${name} --add-source="${startip}/${netmask}"
-/usr/bin/firewall-cmd --zone=${name} --set-target=ACCEPT
+/usr/bin/firewall-cmd --reload
