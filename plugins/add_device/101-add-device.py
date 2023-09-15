@@ -5,6 +5,7 @@
 import json
 import os
 import sys
+import cranixconfig
 from configobj import ConfigObj
 config = ConfigObj("/opt/cranix-java/conf/cranix-api.properties")
 passwd = config['de.cranix.dao.User.Register.Password']
@@ -22,9 +23,9 @@ for line in sys.stdin:
   elif key == "wlanip":
     wlanip=kv[1].split('.')
 
-domain=os.popen('crx_api_text.sh GET system/configuration/DOMAIN').read()
-netmask=int(os.popen('crx_api_text.sh GET system/configuration/NETMASK').read().rstrip())
-network=os.popen('crx_api_text.sh GET system/configuration/NETWORK').read().split('.')
+domain=cranixconfig.CRANIX_DOMAIN
+netmask=int(cranixconfig.CRANIX_NETMASK)
+network=cranixconfig.CRANIX_NETWORK.split('.')
 revdomain=""
 revwlan=""
 if netmask > 23:
