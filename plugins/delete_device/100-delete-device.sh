@@ -44,9 +44,9 @@ done
 
 passwd=$( grep de.cranix.dao.User.Register.Password= /opt/cranix-java/conf/cranix-api.properties | sed 's/de.cranix.dao.User.Register.Password=//' )
 
-samba-tool dns delete localhost $CRANIX_DOMAIN $name  A $ip   -U register%"$passwd"
+samba-tool computer delete "${name}"
 if [ $? != 0 ]; then
-   abort 1
+   samba-tool dns delete localhost $CRANIX_DOMAIN $name  A $ip   -U register%"$passwd"
 fi
 if [ "$wlanip" -a "$wlanmac" ]; then
    samba-tool dns delete localhost $CRANIX_DOMAIN $name  A $wlanip   -U register%"$passwd"
@@ -54,7 +54,6 @@ if [ "$wlanip" -a "$wlanmac" ]; then
       abort 2
    fi
 fi
-samba-tool computer delete "${name}"
 if [ $? != 0 ]; then
    abort 3
 fi
