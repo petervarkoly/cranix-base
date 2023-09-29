@@ -13,7 +13,7 @@ my $imap = Mail::IMAPClient->new(
   Ssl      => 0,
   Uid      => 1,
 );
-
-print $imap->quota_usage("user".$imap->separator.$user)." ";
-print $imap->quota("user".$imap->separator.$user)."\n";
-
+if( $imap ){
+	print $imap->quota_usage("user".$imap->separator.$user)." ";
+	print $imap->quota("user".$imap->separator.$user)."\n";
+}
