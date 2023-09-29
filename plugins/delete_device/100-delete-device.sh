@@ -54,11 +54,11 @@ if [ "$wlanip" -a "$wlanmac" ]; then
       abort 2
    fi
 fi
+samba-tool computer delete "${name}"
+if [ $? != 0 ]; then
+   abort 3
+fi
 if [ "$hwconf" != "BYOD" ]; then
-   samba-tool computer delete "${name}"
-   if [ $? != 0 ]; then
-      abort 3
-   fi
    # Delete workstation user.
    samba-tool user delete "${name}"
    if [ $? != 0 ]; then
