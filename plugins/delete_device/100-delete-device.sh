@@ -37,6 +37,8 @@ do
     wlanmac)
       wlanmac="${c}"
     ;;
+    hwconf)
+      hwconf="${c}"
   esac
 done
 
@@ -47,17 +49,19 @@ if [ $? != 0 ]; then
    abort 1
 fi
 if [ "$wlanip" -a "$wlanmac" ]; then
-	samba-tool dns delete localhost $CRANIX_DOMAIN $name  A $wlanip   -U register%"$passwd"
-	if [ $? != 0 ]; then
-	   abort 2
-	fi
+   samba-tool dns delete localhost $CRANIX_DOMAIN $name  A $wlanip   -U register%"$passwd"
+   if [ $? != 0 ]; then
+      abort 2
+   fi
 fi
-samba-tool computer delete "${name}"
-if [ $? != 0 ]; then
-   abort 3
-fi
-# Delete workstation user.
-samba-tool user delete "${name}"
-if [ $? != 0 ]; then
-   abort 4
+if [ "$hwconf" != "BYOD" ]; then
+   samba-tool computer delete "${name}"
+   if [ $? != 0 ]; then
+      abort 3
+   fi
+   # Delete workstation user.
+   samba-tool user delete "${name}"
+   if [ $? != 0 ]; then
+      abort 4
+   fi
 fi
