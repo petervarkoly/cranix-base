@@ -490,13 +490,38 @@ unset _bred _sgr0
     cp /etc/my.cnf.in /etc/my.cnf
     /usr/bin/systemctl start  mysql
     /usr/bin/systemctl enable mysql
+    ########################################################################
+    log "Make mysql secure"
+    cd /root
+    password=`mktemp XXXXXXXXXX`
+    echo "CREATE DATABASE CRX" | mysql
+    echo "grant all on CRX.* to 'cranix'@'localhost'  identified by '$password'" | mysql
+    mysqladmin -u root password $password
+echo "[client]
+host=localhost
+user=root
+password=$password" > /root/.my.cnf
+chmod 600 /root/.my.cnf
+
+    sed -i s/MYSQLPWD/$password/ /opt/cranix-java/conf/cranix-api.properties
+    sed -i s/CRANIX_NETBIOSNAME/${CRANIX_NETBIOSNAME}/ /opt/cranix-java/conf/cranix-api.properties
+    /usr/bin/systemctl restart  mysql
     sleep 5
     SERVER_NETWORK=$( echo $CRANIX_SERVER_NET | gawk -F '/' '{ print $1 }' )
     SERVER_NETMASK=$( echo $CRANIX_SERVER_NET | gawk -F '/' '{ print $2 }' )
     ANON_NETWORK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $1 }' )
     ANON_NETMASK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $2 }' )
+    if [ "$CRANIX_TYPE" = "cephalix"  ]; then
+        /usr/bin/systemctl restart cephalix-api
+	/usr/share/cranix/tools/wait-for-api.sh
+        /usr/bin/systemctl stop cephalix-api
+    else
+        /usr/bin/systemctl restart cranix-api
+	/usr/share/cranix/tools/wait-for-api.sh
+        /usr/bin/systemctl stop cranix-api
+    fi
 
-    for i in /opt/cranix-java/data/*-INSERT.sql
+    for i in /opt/cranix-java/data/*-inserts.sql
     do
 	sed -i "s/#SERVER_NETWORK#/${SERVER_NETWORK}/g"		$i
 	sed -i "s/#SERVER_NETMASK#/${SERVER_NETMASK}/g"		$i
@@ -512,41 +537,20 @@ unset _bred _sgr0
 	sed -i "s/#CRANIX_NETWORK#/${CRANIX_NETWORK}/g"		$i
 	sed -i "s/#CRANIX_NETMASK#/${CRANIX_NETMASK}/g"		$i
     done
-    mysql < /opt/cranix-java/data/crx-objects.sql
     case $CRANIX_TYPE in
         cephalix)
-            mysql CRX < /opt/cranix-java/data/cephalix-objects.sql
-            mysql CRX < /opt/cranix-java/data/school-INSERT.sql
-            mysql CRX < /opt/cranix-java/data/cephalix-INSERT.sql
+            mysql CRX < /opt/cranix-java/data/school-inserts.sql
+            mysql CRX < /opt/cranix-java/data/cephalix-inserts.sql
+            /usr/bin/systemctl start cephalix-api
 	;;
         business)
-            mysql CRX < /opt/cranix-java/data/business-INSERT.sql
+            mysql CRX < /opt/cranix-java/data/business-inserts.sql
+            /usr/bin/systemctl start cranix-api
 	;;
 	*)
-            mysql CRX < /opt/cranix-java/data/school-INSERT.sql
+            mysql CRX < /opt/cranix-java/data/school-inserts.sql
+            /usr/bin/systemctl start cranix-api
     esac
-
-
-    ########################################################################
-    log "Make mysql secure"
-    cd /root
-    password=`mktemp XXXXXXXXXX`
-    echo "grant all on CRX.* to 'cranix'@'localhost'  identified by '$password'" | mysql
-    mysqladmin -u root password $password
-echo "[client]
-host=localhost
-user=root
-password=$password" > /root/.my.cnf
-chmod 600 /root/.my.cnf
-
-    sed -i s/MYSQLPWD/$password/ /opt/cranix-java/conf/cranix-api.properties
-    sed -i s/CRANIX_NETBIOSNAME/${CRANIX_NETBIOSNAME}/ /opt/cranix-java/conf/cranix-api.properties
-    /usr/bin/systemctl restart  mysql
-    if [ "$CRANIX_TYPE" = "cephalix"  ]; then
-        /usr/bin/systemctl restart cephalix-api
-    else
-        /usr/bin/systemctl restart cranix-api
-    fi
     sleep 3
 
     ########################################################################

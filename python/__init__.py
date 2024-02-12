@@ -2,7 +2,8 @@
 
 # Copyright (c) Peter Varkoly <peter@varkoly.de> All rights reserved.
 
-"""Some python modules for CRANIX
+"""
+Some python modules for CRANIX
 Works with Python versions from 3.6.
 """
 import json
@@ -17,8 +18,10 @@ from ._vars import attr_ext_name
 from ._vars import user_attributes
 
 from . import _functions
+
+from ._functions import check_uid
+from ._functions import check_password
 from ._functions import read_birthday
-from ._functions import create_secure_pw
 from ._functions import print_error
 from ._functions import print_msg
 
@@ -101,7 +104,7 @@ def read_classes():
         existing_classes.append(group.strip().upper())
 
 def read_groups():
-    global existing_groups
+    global all_groups
     for group in os.popen('/usr/sbin/crx_api_text.sh GET groups/text/byType/workgroups').readlines():
         all_groups.append(group.strip().upper())
 
@@ -247,6 +250,7 @@ def log_msg(title,msg):
 
 def add_group(name):
     global new_group_count
+    global all_groups
     group = {}
     group['name'] = name.upper()
     group['groupType'] = 'workgroup'

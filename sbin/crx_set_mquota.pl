@@ -17,7 +17,8 @@ my $imap = Mail::IMAPClient->new(
 if( $quota == 0 ){
 	$quota = -1;
 }
-$imap->setquota("user".$imap->separator.$user,"STORAGE",$quota);
-print $imap->quota("user".$imap->separator.$user)."\n";
-print $imap->quota_usage("user".$imap->separator.$user)."\n";
-
+if( $imap ){
+	$imap->setquota("user".$imap->separator.$user,"STORAGE",$quota);
+	print $imap->quota("user".$imap->separator.$user)."\n";
+	print $imap->quota_usage("user".$imap->separator.$user)."\n";
+}

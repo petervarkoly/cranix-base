@@ -73,6 +73,7 @@ do
 	repoType=$( echo $repo | gawk -F '#' '{ print $1 }' )
 	repoName=$( echo $repo | gawk -F '#' '{ print $2 }' )
 	repoUrl=$(  echo $repo | gawk -F '#' '{ print $3 }' )
+	repoUrl=${repoUrl/VERSION/$VERSION_ID}
 	case $repoType in
 		SALTPKG)
 			zypper -D /srv/salt/repos.d/ ar --refresh --no-gpgcheck ${repoUrl} ${repoName}
