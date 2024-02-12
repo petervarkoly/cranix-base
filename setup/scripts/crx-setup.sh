@@ -516,7 +516,7 @@ chmod 600 /root/.my.cnf
 	/usr/share/cranix/tools/wait-for-api.sh
         /usr/bin/systemctl stop cephalix-api
     else
-        /usr/bin/systemctl restart cephalix-api
+        /usr/bin/systemctl restart cranix-api
 	/usr/share/cranix/tools/wait-for-api.sh
         /usr/bin/systemctl stop cranix-api
     fi
