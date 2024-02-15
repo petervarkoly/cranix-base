@@ -539,16 +539,16 @@ chmod 600 /root/.my.cnf
     done
     case $CRANIX_TYPE in
         cephalix)
-            mysql CRX < /opt/cranix-java/data/school-inserts.sql
-            mysql CRX < /opt/cranix-java/data/cephalix-inserts.sql
+            mysql -f CRX < /opt/cranix-java/data/school-inserts.sql
+            mysql -f CRX < /opt/cranix-java/data/cephalix-inserts.sql
             /usr/bin/systemctl start cephalix-api
 	;;
         business)
-            mysql CRX < /opt/cranix-java/data/business-inserts.sql
+            mysql -f CRX < /opt/cranix-java/data/business-inserts.sql
             /usr/bin/systemctl start cranix-api
 	;;
 	*)
-            mysql CRX < /opt/cranix-java/data/school-inserts.sql
+            mysql -f CRX < /opt/cranix-java/data/school-inserts.sql
             /usr/bin/systemctl start cranix-api
     esac
     sleep 3
