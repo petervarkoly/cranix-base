@@ -58,6 +58,10 @@ try:
     print_config_file = cranixconfig.CRANIX_PRINTSERVER_CONFIG
 except AttributeError:
     print_config_file = "/etc/samba/smb-printserver.conf"
+try:
+    no_masquerade = cranixconfig.CRANIX_NO_MASQUERADE_NET
+except AttributeError:
+    no_masquerade = ""
 
 
 def log_debug(msg):
@@ -169,16 +173,19 @@ def set_state():
               log_debug('/usr/bin/firewall-cmd --zone={0} --add-rich-rule="rule family=ipv4 destination address={1} drop" &>/dev/null'.format(name,proxy))
 
         if not args.let_direct:
+            mask_address=network
+            if no_masquerade != "":
+                mask_address="{0} destination NOT address={1}".format(network,no_masquerade)
             if allow_direct and network not in zones['external']['rule']:
                 #fw_changed = True
                 for rule in zones[key]['richRules']:
                     os.system('/usr/bin/firewall-cmd --zone="external" --remove-rich-rule="{0}" &>/dev/null'.format(rule))
-                os.system('/usr/bin/firewall-cmd --zone="external" --add-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(network))
-                log_debug('/usr/bin/firewall-cmd --zone="external" --add-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(network))
+                os.system('/usr/bin/firewall-cmd --zone="external" --add-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(mask_address))
+                log_debug('/usr/bin/firewall-cmd --zone="external" --add-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(mask_address))
             if not allow_direct and  network in zones['external']['rule']:
                 #fw_changed = True
-                os.system('/usr/bin/firewall-cmd --zone="external" --remove-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(network))
-                log_debug('/usr/bin/firewall-cmd --zone="external" --remove-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(network))
+                os.system('/usr/bin/firewall-cmd --zone="external" --remove-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(mask_address))
+                log_debug('/usr/bin/firewall-cmd --zone="external" --remove-rich-rule="rule family=ipv4 source address={0} masquerade" &>/dev/null'.format(mask_address))
     except KeyError:
         os.system('/usr/share/cranix/tools/sync-rooms-to-firewalld.py &>/dev/null')
 
