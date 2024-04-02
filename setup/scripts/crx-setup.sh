@@ -609,8 +609,8 @@ function PostSetup (){
 	echo "## Enable forwarding."                  >  /etc/sysctl.d/cranix.conf
 	echo "net.ipv4.ip_forward = 1 "              >>  /etc/sysctl.d/cranix.conf
 	echo "net.ipv6.conf.all.forwarding = 1 "     >>  /etc/sysctl.d/cranix.conf
-	extdev=$( grep -l ZONE=external /etc/sysconfig/network/ifcfg* )
-	/usr/bin/firewall-offline-cmd --zone=external --add-interface ${extdev/*ifcfg-/}
+	extdev=$( ip route | gawk '/default/ {  print $5 }' )
+	/usr/bin/firewall-offline-cmd --zone=external --add-interface ${extdev}
 	/usr/bin/firewall-offline-cmd --zone=external --remove-masquerade
     fi
     /usr/bin/firewall-offline-cmd --new-zone=ANON_DHCP
