@@ -658,6 +658,10 @@ function PostSetup (){
     mount -o remount,usrquota,grpquota /home
 
     ########################################################################
+    log "Disable hibernate and suspend mode"
+    systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+    ########################################################################
     log "Timeserver setup"
     /usr/share/cranix/setup/scripts/setup-chrony.sh
     log "End PostSetup"
