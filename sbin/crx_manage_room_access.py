@@ -45,6 +45,7 @@ login_denied_rooms   =[]
 room    = {}
 rooms   = []
 zones   = {}
+default_access = {}
 server_net = cranixconfig.CRANIX_SERVER_NET
 proxy  = cranixconfig.CRANIX_PROXY
 portal = cranixconfig.CRANIX_MAILSERVER
@@ -128,7 +129,7 @@ def set_state():
         name    = room['name']
         network = room['network']
         if args.set_defaults:
-            access = json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/{0}/defaultAccess'.format(room['id'])))
+            access = default_access[room['id']]
             log_debug(access)
             if 'printing' in access:
                 allow_printing = access['printing']
@@ -287,12 +288,16 @@ if args.get:
 else:
     if args.all:
         status = []
+        for access in json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/accessList')):
+            if access['accessType'] == 'DEF':
+                default_access[access['roomId']] = access
         for room in rooms:
             if room['roomControl'] == 'no' or 'startIP' not in room:
                 continue
             prepare_room()
             set_state()
     else:
+        default_access[room['id']] = json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/{0}/defaultAccess'.format(room['id'])))
         set_state()
 
     if smb_reload:
