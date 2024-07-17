@@ -19,10 +19,8 @@ if [ "${VALID}" = "0" ]; then
         echo "Regcode is not valid."
         exit 2
 fi
-zypper rr OSS-4.0-0 &> /dev/null
-zypper rr OSS-4.0-1 &> /dev/null
-zypper rr OSS-4.0.1-0 &> /dev/null
-zypper rr ${NAME}-${VERSION_ID}-0 &> /dev/null
+
+rm /etc/zypp/repos.d/*
 #Save the credentials
 echo "[${CRANIX_UPDATE_URL}/${NAME}/${VERSION_ID}]
 username = ${REPO_USER}
@@ -46,6 +44,7 @@ baseurl=${CRANIX_SALT_PKG_URL}
 path=/
 type=rpm-md
 keeppackages=0
+priority=20
 " > /tmp/salt-packages.repo
 
 zypper -D /srv/salt/repos.d/ ar -G /tmp/salt-packages.repo
@@ -63,6 +62,7 @@ baseurl=${CRANIX_UPDATE_URL}/${NAME}/$VERSION_ID
 path=/
 type=rpm-md
 keeppackages=0
+priority=10
 " > /tmp/cranix.repo
 
 zypper ar -G /tmp/cranix.repo
@@ -76,13 +76,13 @@ do
 	repoUrl=${repoUrl/VERSION/$VERSION_ID}
 	case $repoType in
 		SALTPKG)
-			zypper -D /srv/salt/repos.d/ ar --refresh --no-gpgcheck ${repoUrl} ${repoName}
+			zypper -D /srv/salt/repos.d/ ar --refresh --no-gpgcheck -p 30 ${repoUrl} ${repoName}
 			echo "[${repoUrl}]" >> /etc/zypp/credentials.cat
 			echo "username = ${REPO_USER}" >> /etc/zypp/credentials.cat
 			echo "password = ${REPO_PASSWORD}" >> /etc/zypp/credentials.cat
 			;;
 		SYSTEM)
-			zypper ar --refresh --no-gpgcheck ${repoUrl} ${repoName}
+			zypper ar --refresh --no-gpgcheck -p 30 ${repoUrl} ${repoName}
 			echo "[${repoUrl}]" >> /etc/zypp/credentials.cat
 			echo "username = ${REPO_USER}" >> /etc/zypp/credentials.cat
 			echo "password = ${REPO_PASSWORD}" >> /etc/zypp/credentials.cat

@@ -7,7 +7,7 @@ FILLUPDIR       = /usr/share/fillup-templates/
 PYTHONSITEARCH  = /usr/lib/python3.6/site-packages/
 TOPACKAGE       = Makefile addons cups etc plugins python software sbin setup salt tools templates updates README.md
 HERE            = $(shell pwd)
-REPO            = /data1/OSC/home:pvarkoly:CRANIX
+REPO            = /data1/OSC/home:pvarkoly:CRANIX:leap15.4
 PACKAGE         = cranix-base
 
 install:
