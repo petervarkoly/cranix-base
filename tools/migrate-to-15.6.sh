@@ -30,6 +30,10 @@ if [ -e /var/lib/fileserver/ ]; then
 fi
 mysqldump --databases CRX > /var/adm/cranix/backup/${DATE}/CRX.sql
 
+#Adapt uefi boot image:
+sed -i 's#efi/grub.efi#efi/bootx64.efi#' /etc/dhcpd.conf
+sed -i 's#efi/grub.efi#efi/bootx64.efi#' /usr/share/cranix/templates/dhcpd.conf
+
 #Start the migration
 /usr/bin/zypper --releasever 15.6 -n dup --no-recommends 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-15.6
 
