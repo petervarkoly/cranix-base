@@ -36,7 +36,7 @@ install:
 	rsync -a   $(SHARE)/setup/systemd/  $(DESTDIR)/usr/lib/systemd/system/
 	rsync -a   templates/       $(SHARE)/templates/
 	install -m 755   tools/*    $(SHARE)/tools/
-	install -m 755   updates/*  $(SHARE)/updates/
+	#install -m 755   updates/*  $(SHARE)/updates/
 	rsync -a   salt/            $(DESTDIR)/srv/salt/
 	rsync -a   cups/            $(DESTDIR)/usr/share/cups/
 	rsync -a   python/          $(DESTDIR)/$(PYTHONSITEARCH)/cranix/
