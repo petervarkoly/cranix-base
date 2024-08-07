@@ -5,6 +5,7 @@ I=$2
 a=$3
 m=$4
 R=$5
+F=$6
 
 id ${U} &>/dev/null || exit
 
@@ -16,6 +17,9 @@ fi
 
 if [ -z "${CRANIX_FILESERVER_NETBIOSNAME}" ]; then
 	CRANIX_FILESERVER_NETBIOSNAME="${CRANIX_NETBIOSNAME}"
+fi
+if [ "${F}" ]; then
+        CRANIX_FILESERVER_NETBIOSNAME="${CRANIX_FILESERVER_NETBIOSNAME}.${CRANIX_DOMAIN}"
 fi
 
 role=$( /usr/sbin/crx_api_text.sh GET users/byUid/$U/role )
