@@ -219,8 +219,7 @@ profilePath: \\\\fileserver\\profiles\\administrator
 
     for i in /usr/share/cranix/templates/*.ini
     do
-        b=$( basename $i .ini )
-        sed s/#FILE-SERVER#/$CRANIX_FILESERVER_NETBIOSNAME/ $i > /usr/share/cranix/templates/$b
+	cp $i /usr/share/cranix/templates/$( basename $i .ini )
     done
 
     ########################################################################
