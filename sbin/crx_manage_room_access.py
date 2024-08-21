@@ -49,12 +49,14 @@ login_denied_rooms   =[]
 room    = {}
 rooms   = {}
 default_access = {}
+selected_room  = {}
 ext_dev = config['devices']['external']
 int_dev = config['devices']['internal']
 server_net = cranixconfig.CRANIX_SERVER_NET
 proxy  = cranixconfig.CRANIX_PROXY
 portal = cranixconfig.CRANIX_MAILSERVER
 debug  = cranixconfig.CRANIX_DEBUG == "yes"
+ext_ip = cranixconfig.CRANIX_SERVER_EXT_IP
 config = configparser.ConfigParser(delimiters=('='), strict=False)
 printc = configparser.ConfigParser(delimiters=('='), strict=False)
 printc_changed = False #Rewrite of samba is required
@@ -145,9 +147,9 @@ def set_state(room):
             return
 
     if allow_printing:
-        enable_printing()
+        enable_printing(room)
     else:
-        disable_printing()
+        disable_printing(room)
 
     if allow_login:
         if network in login_denied_rooms:
@@ -193,16 +195,16 @@ def set_state(room):
 
 def get_state(room):
     global login_denied_rooms
-        return {
-            'accessType': 'FW',
-            'roomId':    room['id'],
-            'roomName':  room['name'],
-            'login':     room['network'] not in login_denied_rooms,
-            'printing':  is_printing_allowed(room) and ( room['network'] not in login_denied_rooms ),
-            'proxy':     room['proxy'],
-            'portal':    room['portal'],
-            'direct':    room['direct']
-        }
+    return {
+        'accessType': 'FW',
+        'roomId':    room['id'],
+        'roomName':  room['name'],
+        'login':     room['network'] not in login_denied_rooms,
+        'printing':  is_printing_allowed(room) and ( room['network'] not in login_denied_rooms ),
+        'proxy':     room['proxy'],
+        'portal':    room['portal'],
+        'direct':    room['direct']
+    }
 
 def prepare_room(room):
     room['name'] = room['name'].strip()[0:17].encode("ascii","ignore").decode("ascii","ignore")
@@ -219,7 +221,8 @@ def prepare_room(room):
     room['proxy'] = True
     return room
 
-def read_data()
+def read_data():
+    global selected_room
     config.read('/etc/samba/smb.conf')
     printc.read(print_config_file)
 
@@ -232,7 +235,7 @@ def read_data()
             print("This room '{0}' can not be dynamical controlled".format(room['name']))
             sys.exit(-1)
         if 'startIP' in room:
-            prepare_room()
+            selected_room = prepare_room(room)
         else:
             print("Can not find the room with id {0}".format(args.id))
             sys.exit(-2)
@@ -244,20 +247,13 @@ def read_data()
         print("You have to define a room")
         sys.exit(-1)
     for line in os.popen("/usr/sbin/iptables  -nL -t nat").readlines():
-        #SNAT       all  --  172.16.0.0/24        0.0.0.0/0            to:192.168.178.127
         tmp = line.split()
-        if tmp[0] == "SNAT" or tmp[0] == "MASQUERADE":
-            rooms[tmp[0]]['direct'] = True
+        if len(tmp) > 0 and ((tmp[0] == "SNAT" or tmp[0] == "MASQUERADE") and tmp[3] in rooms):
+            rooms[tmp[3]]['direct'] = True
+    log_debug(rooms)
 #main
 read_data()
 # Now we can send the state if this was the question
-if args.id != "":
-    room = json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/{0}'.format(args.id)))
-    if room['roomControl'] == 'no':
-        print("This room '{0}' can not be dynamical controlled".format(room['name']))
-        sys.exit(-1)
-    if 'startIP' in room:
-        room = prepare_room(room)
 
 if args.get:
     if args.all:
@@ -268,7 +264,7 @@ if args.get:
             status.append(get_state(prepare_room(room)))
         print(json.dumps(status))
     else:
-        print(json.dumps(get_state(room)))
+        print(json.dumps(get_state(selected_room)))
 else:
     if args.all:
         status = []
@@ -280,8 +276,8 @@ else:
                 continue
             set_state(prepare_room(room))
     else:
-        default_access[room['id']] = json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/{0}/defaultAccess'.format(room['id'])))
-        set_state(room)
+        default_access[selected_room['id']] = json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/{0}/defaultAccess'.format(selected_room['id'])))
+        set_state(selected_room)
 
     if smb_reload:
         if len(login_denied_rooms) == 0:
