@@ -7,30 +7,22 @@ import os
 import re
 import sys
 import cranixconfig
+import inspect
 from datetime import datetime
 from argparse import ArgumentParser
 
 #Parse arguments
 parser = ArgumentParser()
-parser.add_argument("--id",   dest="id",   default="", help="The room id.")
-parser.add_argument("--all",  dest="all",  default=False, action="store_true", help="Get or set the values of all rooms.")
-parser.add_argument("--get", dest="get", default=False, action="store_true",
-                    help="Gets the actuall access in a room.")
-parser.add_argument("--deny_printing",  dest="deny_printing",   default=False, action="store_true",
-                    help="Allow the printing access in a room.")
-parser.add_argument("--deny_login",  dest="deny_login",   default=False, action="store_true",
-                    help="Allow the login access in a room.")
-parser.add_argument("--deny_portal",  dest="deny_portal",   default=False, action="store_true",
-                    help="Allow the portal access in a room.")
-parser.add_argument("--deny_direct",  dest="deny_direct",   default=False, action="store_true",
-                    help="Allow the direct internet access in a room.")
-parser.add_argument("--let_direct",  dest="let_direct",   default=False, action="store_true",
-                    help="Do not change the direct internet setting.")
-parser.add_argument("--deny_proxy",  dest="deny_proxy",   default=False, action="store_true",
-                    help="Allow the proxy access in a room.")
-parser.add_argument("--set_defaults",  dest="set_defaults",   default=False, action="store_true",
-                    help="Set the default access state in the room(s).")
-parser.set_defaults(allow=True)
+parser.add_argument("--id",            help="The room id.")
+parser.add_argument("--all",           action="store_true", help="Get or set the values of all rooms.")
+parser.add_argument("--get",           action="store_true", help="Gets the actuall access in a room.")
+parser.add_argument("--deny_printing", action="store_true", help="Allow the printing access in a room.")
+parser.add_argument("--deny_login",    action="store_true", help="Allow the login access in a room.")
+parser.add_argument("--deny_portal",   action="store_true", help="Allow the portal access in a room.")
+parser.add_argument("--deny_direct",   action="store_true", help="Allow the direct internet access in a room.")
+parser.add_argument("--let_direct",    action="store_true", help="Do not change the direct internet setting.")
+parser.add_argument("--deny_proxy",    action="store_true", help="Allow the proxy access in a room.")
+parser.add_argument("--set_defaults",  action="store_true", help="Set the default access state in the room(s).")
 args = parser.parse_args()
 
 #Read CRANIX-Firewall
@@ -49,7 +41,6 @@ login_denied_rooms   =[]
 room    = {}
 rooms   = {}
 default_access = {}
-selected_room  = {}
 ext_dev = config['devices']['external']
 int_dev = config['devices']['internal']
 server_net = cranixconfig.CRANIX_SERVER_NET
@@ -76,7 +67,7 @@ def log_debug(msg):
     global debug
     if debug:
         with open(debug_file,"a") as log:
-            log.write('DEBUG {0} {1}\n'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"),msg))
+            log.write('DEBUG {0} Caller: {1} {2}\n'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"),inspect.stack()[1][3],msg))
 
 def log_error(msg):
     with open(debug_file,"a") as log:
@@ -160,38 +151,38 @@ def set_state(room):
         login_denied_rooms.append(network)
 
     if allow_portal and not room['portal']:
-        while os.system(f"/usr/sbin/iptables -D INPUT -s {network} -d {portal} -j DROP") == 0:
+        while os.system(f"/usr/sbin/iptables -D INPUT -s {network} -d {portal} -j DROP &> /dev/null") == 0:
             pass
         log_debug(f"/usr/sbin/iptables -D INPUT -s {network} -d {portal} -j DROP")
     if not allow_portal and room['portal']:
-        os.system(f"/usr/sbin/iptables -A INPUT -s {network} -d {portal} -j DROP")
+        os.system(f"/usr/sbin/iptables -A INPUT -s {network} -d {portal} -j DROP &> /dev/null")
         log_debug(f"/usr/sbin/iptables -A INPUT -s {network} -d {portal} -j DROP")
 
     if allow_proxy and not room['proxy']:
-        while os.system(f"/usr/sbin/iptables -D INPUT -s {network} -d {proxy} -j DROP") == 0:
+        while os.system(f"/usr/sbin/iptables -D INPUT -s {network} -d {proxy} -j DROP &> /dev/null") == 0:
             pass
         log_debug(f"/usr/sbin/iptables -D INPUT -s {network} -d {proxy} -j DROP")
     if not allow_proxy and room['proxy']:
-        os.system(f"/usr/sbin/iptables -A INPUT -s {network} -d {proxy} -j DROP")
+        os.system(f"/usr/sbin/iptables -A INPUT -s {network} -d {proxy} -j DROP &> /dev/null")
         log_debug(f"/usr/sbin/iptables -A INPUT -s {network} -d {proxy} -j DROP")
-
+    log_debug(room)
     if not args.let_direct:
         mask_address=network
         if no_masquerade != "":
             mask_address=f"{network} ! -d {no_masquerade}"
         if allow_direct and not room['direct']:
-            os.system(f"/usr/sbin/iptables -t nat -A POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip}")
+            os.system(f"/usr/sbin/iptables -t nat -A POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip} &> /dev/null")
             log_debug(f"/usr/sbin/iptables -t nat -A POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip}")
-            os.system(f"/usr/sbin/iptables -A FORWARD -s {network} -o {ext_dev} -j ACCEPT")
+            os.system(f"/usr/sbin/iptables -A FORWARD -s {network} -o {ext_dev} -j ACCEPT &> /dev/null")
             log_debug(f"/usr/sbin/iptables -A FORWARD -s {network} -o {ext_dev} -j ACCEPT")
 
         if not allow_direct and  room['direct']:
-            while os.system(f"/usr/sbin/iptables -t nat -A POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip}") == 0:
+            while os.system(f"/usr/sbin/iptables -t nat -D POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip} &> /dev/null") == 0:
                 pass
-            log_debug(f"/usr/sbin/iptables -t nat -A POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip}")
-            while os.system(f"/usr/sbin/iptables -A FORWARD -s {network} -o {ext_dev} -j ACCEPT") == 0:
+            log_debug(f"/usr/sbin/iptables -t nat -D POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip}")
+            while os.system(f"/usr/sbin/iptables -D FORWARD -s {network} -o {ext_dev} -j ACCEPT &> /dev/null") == 0:
                 pass
-            log_debug(f"/usr/sbin/iptables -A FORWARD -s {network} -o {ext_dev} -j ACCEPT")
+            log_debug(f"/usr/sbin/iptables -D FORWARD -s {network} -o {ext_dev} -j ACCEPT &> /dev/null")
 
 def get_state(room):
     global login_denied_rooms
@@ -222,20 +213,20 @@ def prepare_room(room):
     return room
 
 def read_data():
-    global selected_room
     config.read('/etc/samba/smb.conf')
     printc.read(print_config_file)
 
     if 'hosts deny' in config['global']:
         login_denied_rooms    = config.get('global','hosts deny').split()
 
-    if args.id != "":
+    if args.id:
         room = json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/{0}'.format(args.id)))
-        if room['roomControl'] == 'no':
+        if 'roomControl' in room and room['roomControl'] == 'no':
             print("This room '{0}' can not be dynamical controlled".format(room['name']))
             sys.exit(-1)
         if 'startIP' in room:
-            selected_room = prepare_room(room)
+            tmp = prepare_room(room)
+            rooms[f"{room['startIP']}/{room['netMask']}"] = tmp
         else:
             print("Can not find the room with id {0}".format(args.id))
             sys.exit(-2)
@@ -261,10 +252,11 @@ if args.get:
         for roomNetwork, room in rooms.items():
             if room['roomControl'] == 'no' or 'startIP' not in room:
                 continue
-            status.append(get_state(prepare_room(room)))
+            status.append(get_state(room))
         print(json.dumps(status))
     else:
-        print(json.dumps(get_state(selected_room)))
+        for roomNetwork, room in rooms.items():
+            print(json.dumps(get_state(room)))
 else:
     if args.all:
         status = []
@@ -276,8 +268,9 @@ else:
                 continue
             set_state(prepare_room(room))
     else:
-        default_access[selected_room['id']] = json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/{0}/defaultAccess'.format(selected_room['id'])))
-        set_state(selected_room)
+        for roomNetwork, room in rooms.items():
+            default_access[room['id']] = json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/{0}/defaultAccess'.format(room['id'])))
+            set_state(room)
 
     if smb_reload:
         if len(login_denied_rooms) == 0:
@@ -286,7 +279,7 @@ else:
             config.set('global','hosts deny'," ".join(login_denied_rooms))
         with open('/etc/samba/smb.conf','wt') as f:
             config.write(f)
-        os.system("/usr/bin/systemctl reload samba-ad.service")
+        os.system("/usr/bin/systemctl reload samba-ad.service &> /dev/null")
     if printc_changed:
         with open(print_config_file,'wt') as f:
             printc.write(f)
