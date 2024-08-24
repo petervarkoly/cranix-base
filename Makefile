@@ -22,7 +22,6 @@ install:
 	mkdir -p $(DESTDIR)/srv/salt/_modules/
 	mkdir -p $(DESTDIR)/usr/share/cups/
 	mkdir -p $(DESTDIR)/usr/lib/rpm/gnupg/keys/
-	mkdir -p $(DESTDIR)/usr/lib/systemd/system/firewalld.service.d/
 	mkdir -p $(DESTDIR)/var/adm/cranix/running
 	install -m 644 setup/cranix      $(DESTDIR)/$(FILLUPDIR)/sysconfig.cranix
 	rm -f setup/cranix
