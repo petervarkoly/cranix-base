@@ -8,6 +8,7 @@ PYTHONSITEARCH  = /usr/lib/python3.6/site-packages/
 TOPACKAGE       = Makefile addons cups etc plugins python software sbin setup salt tools templates updates README.md
 HERE            = $(shell pwd)
 REPO            = /data1/OSC/home:pvarkoly:CRANIX
+REPO2           = /data1/OSC/home:pvarkoly:CRANIX:leap15.6
 PACKAGE         = cranix-base
 
 install:
@@ -60,6 +61,11 @@ dist:
 	   cd $(REPO)/$(PACKAGE); \
 	   osc vc; \
 	   osc ci -m "New Build Version"; \
+	fi
+	if [ "$(REPO2)" ]; then \
+	   cp $(REPO)/$(PACKAGE)/$(PACKAGE).tar.bz2 $(REPO2)/$(PACKAGE); \
+	   cp $(REPO)/$(PACKAGE)/$(PACKAGE).changes $(REPO2)/$(PACKAGE); \
+	   cd $(REPO2)/$(PACKAGE); osc ci -m "New Build Version"; \
 	fi
 
 
