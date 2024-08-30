@@ -1,7 +1,7 @@
 enable apache2.service
 enable atd.service
 enable clamd.service
-enable firewalld.service
+enable cranix-firewall.service
 enable freshclam.service
 enable chronyd.service
 enable cranix-api.service

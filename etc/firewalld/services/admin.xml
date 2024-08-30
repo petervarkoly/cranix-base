@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<service>
-  <short>CRANIX Admin</short>
-  <description>The external https access to the CRANIX admin cockpit on 444/TCP port.</description>
-  <port protocol="tcp" port="444"/>
-</service>
-
