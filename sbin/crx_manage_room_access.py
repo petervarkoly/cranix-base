@@ -155,26 +155,26 @@ def set_state(room):
             pass
         log_debug(f"/usr/sbin/iptables -D INPUT -s {network} -d {portal} -j DROP")
     if not allow_portal and room['portal']:
-        os.system(f"/usr/sbin/iptables -A INPUT -s {network} -d {portal} -j DROP &> /dev/null")
-        log_debug(f"/usr/sbin/iptables -A INPUT -s {network} -d {portal} -j DROP")
+        os.system(f"/usr/sbin/iptables -I INPUT -s {network} -d {portal} -j DROP &> /dev/null")
+        log_debug(f"/usr/sbin/iptables -I INPUT -s {network} -d {portal} -j DROP")
 
     if allow_proxy and not room['proxy']:
         while os.system(f"/usr/sbin/iptables -D INPUT -s {network} -d {proxy} -j DROP &> /dev/null") == 0:
             pass
         log_debug(f"/usr/sbin/iptables -D INPUT -s {network} -d {proxy} -j DROP")
     if not allow_proxy and room['proxy']:
-        os.system(f"/usr/sbin/iptables -A INPUT -s {network} -d {proxy} -j DROP &> /dev/null")
-        log_debug(f"/usr/sbin/iptables -A INPUT -s {network} -d {proxy} -j DROP")
+        os.system(f"/usr/sbin/iptables -I INPUT -s {network} -d {proxy} -j DROP &> /dev/null")
+        log_debug(f"/usr/sbin/iptables -I INPUT -s {network} -d {proxy} -j DROP")
     log_debug(room)
     if not args.let_direct:
         mask_address=network
         if no_masquerade != "":
             mask_address=f"{network} ! -d {no_masquerade}"
         if allow_direct and not room['direct']:
-            os.system(f"/usr/sbin/iptables -t nat -A POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip} &> /dev/null")
-            log_debug(f"/usr/sbin/iptables -t nat -A POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip}")
-            os.system(f"/usr/sbin/iptables -A FORWARD -s {network} -o {ext_dev} -j ACCEPT &> /dev/null")
-            log_debug(f"/usr/sbin/iptables -A FORWARD -s {network} -o {ext_dev} -j ACCEPT")
+            os.system(f"/usr/sbin/iptables -t nat -I POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip} &> /dev/null")
+            log_debug(f"/usr/sbin/iptables -t nat -I POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip}")
+            os.system(f"/usr/sbin/iptables -I FORWARD -s {network} -o {ext_dev} -j ACCEPT &> /dev/null")
+            log_debug(f"/usr/sbin/iptables -I FORWARD -s {network} -o {ext_dev} -j ACCEPT")
 
         if not allow_direct and  room['direct']:
             while os.system(f"/usr/sbin/iptables -t nat -D POSTROUTING -s {network} -o {ext_dev} -j SNAT --to-source {ext_ip} &> /dev/null") == 0:
