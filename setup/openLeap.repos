@@ -1,0 +1,51 @@
+[repo-backports-update]
+name=Update repository of openSUSE Backports
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/update/leap/VERSION_ID/backports/
+path=/
+type=rpm-md
+keeppackages=0
+
+[repo-non-oss]
+name=Non-OSS Repository
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/distribution/leap/VERSION_ID/repo/non-oss/
+path=/
+type=rpm-md
+keeppackages=0
+
+[repo-oss]
+name=Main Repository
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/distribution/leap/VERSION_ID/repo/oss/
+path=/
+type=rpm-md
+keeppackages=0
+
+[repo-sle-update]
+name=Update repository with updates from SUSE Linux Enterprise 15
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/update/leap/VERSION_ID/sle/
+path=/
+type=rpm-md
+keeppackages=0
+
+[repo-source]
+name=Source Repository
+enabled=0
+autorefresh=1
+baseurl=http://download.opensuse.org/source/distribution/leap/VERSION_ID/repo/oss/
+keeppackages=0
+
+[repo-update]
+name=Main Update Repository
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/update/leap/VERSION_ID/oss
+path=/
+type=rpm-md
+keeppackages=0

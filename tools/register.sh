@@ -51,9 +51,6 @@ zypper -D /srv/salt/repos.d/ ar -G /tmp/salt-packages.repo
 
 zypper --gpg-auto-import-keys -D /srv/salt/repos.d/ ref
 
-#Register ${NAME} repository
-zypper rr ${NAME} &> /dev/null
-
 echo "[${NAME}]
 name=${NAME}
 enabled=1
@@ -92,9 +89,14 @@ do
 	esac
 done
 
-zypper --gpg-auto-import-keys ref
 #We need the CRANIX packages for the salt packages too
 if [ ! -e /srv/salt/repos.d/CRANIX.repo ]; then
 	ln -s /etc/zypp/repos.d/CRANIX.repo  /srv/salt/repos.d/CRANIX.repo
 fi
 
+zypper ar /usr/share/cranix/setup/openLeap.repos
+for i in /etc/zypp/repos.d/*.repo
+do
+        sed -i s/VERSION_ID/${VERSION_ID}/ $i
+done
+/usr/bin/zypper --gpg-auto-import-keys ref
