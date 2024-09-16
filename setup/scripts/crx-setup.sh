@@ -511,12 +511,18 @@ chmod 600 /root/.my.cnf
     ANON_NETWORK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $1 }' )
     ANON_NETMASK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $2 }' )
     if [ "$CRANIX_TYPE" = "cephalix"  ]; then
-        /usr/bin/systemctl restart cephalix-api
-	/usr/share/cranix/tools/wait-for-api.sh
+        /usr/bin/systemctl stop cephalix-api
+	sleep 5
+        /usr/bin/systemctl start cephalix-api
+	/usr/bin/curl -s -X GET --header 'Content-Type: application/json' --header 'Accept: text/plain' --header 'Authorization: Bearer ' "http://localhost:9080/api/system/name"
+	sleep 5
         /usr/bin/systemctl stop cephalix-api
     else
-        /usr/bin/systemctl restart cranix-api
-	/usr/share/cranix/tools/wait-for-api.sh
+        /usr/bin/systemctl stop cranix-api
+	sleep 5
+        /usr/bin/systemctl start cranix-api
+	/usr/bin/curl -s -X GET --header 'Content-Type: application/json' --header 'Accept: text/plain' --header 'Authorization: Bearer ' "http://localhost:9080/api/system/name"
+	sleep 5
         /usr/bin/systemctl stop cranix-api
     fi
 
