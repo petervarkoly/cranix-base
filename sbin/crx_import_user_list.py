@@ -46,6 +46,7 @@ cranix.init(args)
 if args.full and args.role == 'students':
     for ident in cranix.all_users:
         if not ident in cranix.import_list and not cranix.all_users[ident]['uid'] in cranix.protected_users:
+            cranix.del_users.add(ident)
             cranix.log_msg(ident,"User will be deleted")
             if not args.test:
                 cranix.delete_user(cranix.all_users[ident]['uid'])
@@ -69,6 +70,10 @@ for ident in cranix.import_list:
         new_user['id']  = old_user['id']
         new_user['uid'] = old_user['uid']
         old_classes = old_user['classes'].split(',')
+        if old_user['classes'] != new_user['classes']:
+            cranix.moved_users.add(ident)
+        else:
+            cranix.stand_users.add(ident)
         cranix.log_debug("Old user",old_user)
         cranix.log_msg(ident,"Old user. Old classes: " + old_user['classes'] + " New Classes:" + new_user['classes'] )
         if not args.test:
@@ -111,6 +116,7 @@ for ident in cranix.import_list:
         if cl not in cranix.required_classes:
             cranix.required_classes.append(cl)
         if cl not in cranix.existing_classes:
+            cranix.new_groups.add(cl)
             cranix.log_msg(cl,"New class")
             if not args.test:
                 cranix.add_class(cl)
@@ -120,6 +126,7 @@ for ident in cranix.import_list:
     if 'group' in cranix.import_list[ident]:
         for gr in cranix.import_list[ident]['group'].split():
             if gr.upper() not in cranix.all_groups:
+                 cranix.new_groups.add(gr)
                  cranix.log_msg(gr,"New group")
                  if not args.test:
                      cranix.add_group(gr)
@@ -147,6 +154,7 @@ if args.allClasses:
    for c in cranix.existing_classes:
        if not c in cranix.required_classes:
           cranix.log_msg(c,"Class will be deleted")
+          cranix.del_groups.add(c)
           if not args.test:
               cranix.delete_class(c)
    cranix.read_classes()

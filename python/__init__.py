@@ -11,6 +11,8 @@ import os
 import sys
 import time
 import csv
+
+from typing import Set
 from configobj import ConfigObj
 
 from . import _vars
@@ -30,6 +32,7 @@ from ._functions import create_secure_pw
 init_debug = False
 
 # Define some global variables
+logs = []
 required_classes = []
 existing_classes = []
 protected_users  = []
@@ -39,6 +42,13 @@ import_list = {}
 new_user_count  = 1
 new_group_count = 1
 lockfile = '/run/crx_import_user'
+
+new_users: Set[str] = set([])
+new_groups: Set[str] = set([])
+del_users: Set[str] = set([])
+del_groups: Set[str] = set([])
+moved_users: Set[str] = set([])
+stand_users: Set[str] = set([])
 
 date = time.strftime("%Y-%m-%d.%H-%M-%S")
 # read and set some default values
@@ -54,7 +64,7 @@ for role in os.popen('/usr/sbin/crx_api_text.sh GET groups/text/byType/primary')
   roles.append(role.strip())
 
 def init(args):
-    global output, input_file, role, password, identifier, full, test, debug, mustChange
+    global input_file, role, password, identifier, full, test, debug, mustChange
     global resetPassword, allClasses, cleanClassDirs, appendBirthdayToPassword, appendClassToPassword
     global import_dir, required_classes, existing_classes, all_users, import_list
     global fsQuota, fsTeacherQuota, msQuota, msTeacherQuota
@@ -70,8 +80,6 @@ def init(args):
     os.system("/usr/sbin/crx_api.sh PUT system/configuration/CHECK_PASSWORD_QUALITY/no")
     import_dir = home_base + "/groups/SYSADMINS/userimports/" + date
     os.system('mkdir -pm 770 ' + import_dir + '/tmp' )
-    #open the output file
-    output     = open(import_dir + '/import.log','w')
     #create lock file
     with open(lockfile,'w') as f:
         f.write(date)
@@ -227,8 +235,7 @@ def close():
     else:
         os.system("/usr/sbin/crx_api.sh PUT system/configuration/CHECK_PASSWORD_QUALITY/no")
     os.remove(lockfile)
-    output.write(print_msg("Import finished","OK"))
-    output.close()
+    log_msg("Import finished","OK")
 
 def close_on_error(msg):
     if check_pw:
@@ -236,18 +243,37 @@ def close_on_error(msg):
     else:
         os.system("/usr/sbin/crx_api.sh PUT system/configuration/CHECK_PASSWORD_QUALITY/no")
     os.remove(lockfile)
-    output.write(print_error(msg))
-    output.write(print_msg("Import finished","ERROR"))
-    output.close()
+    log_error(msg)
+    log_msg("Import finished","ERROR")
     sys.exit(1)
 
+def prep_log_head():
+    if len(logs) == 0:
+        logs.append("<h2>New Users: {0}</h2>".format(len(new_users)))
+        logs.append("<h2>Deleted Users: {0}</h2>".format(len(del_users)))
+        logs.append("<h2>Moved Users: {0}</h2>".format(len(moved_users)))
+        logs.append("<h2>Moved Users: {0}</h2>".format(len(stand_users)))
+        logs.append("<h2>New Groups: {0}</h2>".format(len(new_groups)))
+        logs.append("<h2>Deleted Groups: {0}</h2>".format(len(del_groups)))
+    else:
+        logs[0] = "<h2>New Users: {0}</h2>".format(len(new_users))
+        logs[1] = "<h2>Deleted Users: {0}</h2>".format(len(del_users))
+        logs[2] = "<h2>Moved Users: {0}</h2>".format(len(moved_users))
+        logs[3] = "<h2>Standing Users: {0}</h2>".format(len(stand_users))
+        logs[4] = "<h2>New Groups: {0}</h2>".format(len(new_groups))
+        logs[5] = "<h2>Deleted Groups: {0}</h2>".format(len(del_groups))
+
 def log_error(msg):
-    output.write(print_error(msg))
-    output.flush()
+    global logs
+    logs.append(print_error(msg))
+    with open(import_dir + '/import.log','w') as output:
+        output.writelines(logs)
 
 def log_msg(title,msg):
-    output.write(print_msg(title,msg))
-    output.flush()
+    global logs
+    logs.append(print_msg(title, msg))
+    with open(import_dir + '/import.log','w') as output:
+        output.writelines(logs)
 
 def add_group(name):
     global new_group_count
