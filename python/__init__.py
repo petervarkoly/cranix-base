@@ -249,28 +249,30 @@ def close_on_error(msg):
 
 def prep_log_head():
     if len(logs) == 0:
-        logs.append("<h2>New Users: {0}</h2>".format(len(new_users)))
-        logs.append("<h2>Deleted Users: {0}</h2>".format(len(del_users)))
-        logs.append("<h2>Moved Users: {0}</h2>".format(len(moved_users)))
-        logs.append("<h2>Moved Users: {0}</h2>".format(len(stand_users)))
-        logs.append("<h2>New Groups: {0}</h2>".format(len(new_groups)))
-        logs.append("<h2>Deleted Groups: {0}</h2>".format(len(del_groups)))
+        logs.append("<h2>New Users: {0}</h2>\n".format(len(new_users)))
+        logs.append("<h2>Deleted Users: {0}</h2>\n".format(len(del_users)))
+        logs.append("<h2>Moved Users: {0}</h2>\n".format(len(moved_users)))
+        logs.append("<h2>Moved Users: {0}</h2>\n".format(len(stand_users)))
+        logs.append("<h2>New Groups: {0}</h2>\n".format(len(new_groups)))
+        logs.append("<h2>Deleted Groups: {0}</h2>\n".format(len(del_groups)))
     else:
-        logs[0] = "<h2>New Users: {0}</h2>".format(len(new_users))
-        logs[1] = "<h2>Deleted Users: {0}</h2>".format(len(del_users))
-        logs[2] = "<h2>Moved Users: {0}</h2>".format(len(moved_users))
-        logs[3] = "<h2>Standing Users: {0}</h2>".format(len(stand_users))
-        logs[4] = "<h2>New Groups: {0}</h2>".format(len(new_groups))
-        logs[5] = "<h2>Deleted Groups: {0}</h2>".format(len(del_groups))
+        logs[0] = "<h2>New Users: {0}</h2>\n".format(len(new_users))
+        logs[1] = "<h2>Deleted Users: {0}</h2>\n".format(len(del_users))
+        logs[2] = "<h2>Moved Users: {0}</h2>\n".format(len(moved_users))
+        logs[3] = "<h2>Standing Users: {0}</h2>\n".format(len(stand_users))
+        logs[4] = "<h2>New Groups: {0}</h2>\n".format(len(new_groups))
+        logs[5] = "<h2>Deleted Groups: {0}</h2>\n".format(len(del_groups))
 
 def log_error(msg):
     global logs
+    prep_log_head()
     logs.append(print_error(msg))
     with open(import_dir + '/import.log','w') as output:
         output.writelines(logs)
 
 def log_msg(title,msg):
     global logs
+    prep_log_head()
     logs.append(print_msg(title, msg))
     with open(import_dir + '/import.log','w') as output:
         output.writelines(logs)
