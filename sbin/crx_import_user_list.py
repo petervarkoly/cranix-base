@@ -92,6 +92,7 @@ for ident in cranix.import_list:
                 old_user['mustChange'] =  args.mustChange
             cranix.modify_user(old_user,ident)
     else:
+        cranix.new_users.add(ident)
         cranix.log_debug("New user",new_user)
         cranix.log_msg(ident,"New user. Classes:" + new_user['classes'])
         if not args.test:
