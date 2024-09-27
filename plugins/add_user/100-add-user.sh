@@ -137,7 +137,7 @@ if [ "${CRANIX_CHECK_PASSWORD_QUALITY}" = "yes" ]; then
    samba-tool domain passwordsettings set --complexity=on
 fi
 
-#create home diredtory copy template user homedirectory and set permission
+# create home diredtory copy template user homedirectory and set permission
 mkdir -p $unixhome
 /usr/sbin/crx_copy_template_home.sh $uid
 if [ "$CRANIX_TEACHER_OBSERV_HOME" = "yes" -a "$role" = "students" ]; then
@@ -147,28 +147,32 @@ else
 	chown -R $uidNumber:100 "$unixhome"
 	chmod 0700 "$unixhome"
 fi
-#Workaround
+# Workaround
 if [ $CRANIX_SORT_HOMES = "yes" ]; then
         ln -s $unixhome ${CRANIX_HOME_BASE}/${CRANIX_WORKGROUP}/$uid
 fi
 
-#add user to groups
-samba-tool group addmembers "$role" "$uid"
-
-#Workstation users password should not expire
+# Workstation users need some special settings:
+# Password should not expire
+# Workstation users may logon only on the own workstation
+# Workstation users need to be added to its group by the DN instaed of by uid.
 if [ "$role" = "workstations" ]; then
-	tmpldif=$( mktemp /tmp/XXXXXXXX )
-	/usr/sbin/crx_get_dn.sh $uid > $tmpldif
-	echo "changetype: modify
+        tmpldif=$( mktemp /tmp/XXXXXXXX )
+        /usr/sbin/crx_get_dn.sh $uid > $tmpldif
+        echo "changetype: modify
 add: userWorkstations
 userWorkstations: ${userWorkstations},$uid" >> $tmpldif
-	ldbmodify  -H /var/lib/samba/private/sam.ldb $tmpldif
-	samba-tool user setexpiry  --noexpiry $uid
-	rm -f $tmpldif
-	#pdbedit -u $uid -c "[X]"
+        ldbmodify  -H /var/lib/samba/private/sam.ldb $tmpldif
+        samba-tool user setexpiry  --noexpiry $uid
+        rm -f $tmpldif
+        samba-tool group addmembers workstations --member-dn="CN=${uid},OU=workstations,$( /usr/sbin/crx_get_dn.sh )"
+        #pdbedit -u $uid -c "[X]"
+else
+        #add user to groups
+        samba-tool group addmembers "$role" "$uid"
 fi
 
-#Set default quota
+# Set default quota
 if [ -z "$fsquota" ]; then
         fsquota=$CRANIX_FILE_QUOTA
         if [ $role = "teachers" ]; then
@@ -178,7 +182,7 @@ fi
 
 /usr/sbin/crx_set_quota.sh $uid $fsquota
 
-#Set mailsystem quota
+# Set mailsystem quota
 if [ "$role" != "workstations" -a "$role" != "guests" ]; then
 	/usr/sbin/crx_set_mquota.pl $uid $msquota
 fi

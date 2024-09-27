@@ -219,8 +219,7 @@ profilePath: \\\\fileserver\\profiles\\administrator
 
     for i in /usr/share/cranix/templates/*.ini
     do
-        b=$( basename $i .ini )
-        sed s/#FILE-SERVER#/$CRANIX_FILESERVER_NETBIOSNAME/ $i > /usr/share/cranix/templates/$b
+	cp $i /usr/share/cranix/templates/$( basename $i .ini )
     done
 
     ########################################################################
@@ -512,12 +511,18 @@ chmod 600 /root/.my.cnf
     ANON_NETWORK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $1 }' )
     ANON_NETMASK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $2 }' )
     if [ "$CRANIX_TYPE" = "cephalix"  ]; then
-        /usr/bin/systemctl restart cephalix-api
+        /usr/bin/systemctl stop cephalix-api
+        /usr/bin/systemctl start cephalix-api
+	sleep 10
 	/usr/share/cranix/tools/wait-for-api.sh
+	sleep 5
         /usr/bin/systemctl stop cephalix-api
     else
-        /usr/bin/systemctl restart cranix-api
+        /usr/bin/systemctl stop cranix-api
+        /usr/bin/systemctl start cranix-api
+	sleep 10
 	/usr/share/cranix/tools/wait-for-api.sh
+	sleep 5
         /usr/bin/systemctl stop cranix-api
     fi
 
@@ -539,16 +544,16 @@ chmod 600 /root/.my.cnf
     done
     case $CRANIX_TYPE in
         cephalix)
-            mysql CRX < /opt/cranix-java/data/school-inserts.sql
-            mysql CRX < /opt/cranix-java/data/cephalix-inserts.sql
+            mysql -f CRX < /opt/cranix-java/data/school-inserts.sql
+            mysql -f CRX < /opt/cranix-java/data/cephalix-inserts.sql
             /usr/bin/systemctl start cephalix-api
 	;;
         business)
-            mysql CRX < /opt/cranix-java/data/business-inserts.sql
+            mysql -f CRX < /opt/cranix-java/data/business-inserts.sql
             /usr/bin/systemctl start cranix-api
 	;;
 	*)
-            mysql CRX < /opt/cranix-java/data/school-inserts.sql
+            mysql -f CRX < /opt/cranix-java/data/school-inserts.sql
             /usr/bin/systemctl start cranix-api
     esac
     sleep 3
@@ -600,29 +605,12 @@ function PostSetup (){
     /usr/bin/systemctl start  apache2
 
     ########################################################################
-    log "Setup firewalld"
-    cp /etc/firewalld/firewalld.conf /etc/firewalld/firewalld.conf.orig
-    sed -i 's/DefaultZone=.*/DefaultZone=external/'         /etc/firewalld/firewalld.conf
-    sed -i 's/FirewallBackend=.*/FirewallBackend=iptables/' /etc/firewalld/firewalld.conf
-    /usr/bin/systemctl enable firewalld
+    log "Setup firewall"
+    /usr/bin/systemctl enable cranix-firewall
     if [ $CRANIX_ISGATE = "yes" ]; then
 	echo "## Enable forwarding."                  >  /etc/sysctl.d/cranix.conf
 	echo "net.ipv4.ip_forward = 1 "              >>  /etc/sysctl.d/cranix.conf
 	echo "net.ipv6.conf.all.forwarding = 1 "     >>  /etc/sysctl.d/cranix.conf
-	extdev=$( grep -l ZONE=external /etc/sysconfig/network/ifcfg* )
-	/usr/bin/firewall-offline-cmd --zone=external --add-interface ${extdev/*ifcfg-/}
-	/usr/bin/firewall-offline-cmd --zone=external --remove-masquerade
-    fi
-    /usr/bin/firewall-offline-cmd --new-zone=ANON_DHCP
-    /usr/bin/firewall-offline-cmd --zone=ANON_DHCP --set-description="Zone for ANON_DHCP"
-    /usr/bin/firewall-offline-cmd --zone=ANON_DHCP --add-source="$CRANIX_ANON_DHCP_NET"
-    /usr/bin/firewall-offline-cmd --zone=ANON_DHCP --set-target=ACCEPT
-    /usr/bin/firewall-offline-cmd --new-zone=SERVER_NET
-    /usr/bin/firewall-offline-cmd --zone=SERVER_NET --set-description="Zone for SERVER_NET"
-    /usr/bin/firewall-offline-cmd --zone=SERVER_NET --add-source="$CRANIX_SERVER_NET"
-    /usr/bin/firewall-offline-cmd --zone=SERVER_NET --set-target=ACCEPT
-    if [ ${CRANIX_INTERNET_FILTER} = "dns" ]; then
-        /usr/bin/firewall-offline-cmd --zone=external --add-rich-rule="rule family=ipv4 source address=$CRANIX_SERVER_NET masquerade"
     fi
 
     ########################################################################
@@ -656,6 +644,10 @@ function PostSetup (){
     log "Enable user and group quota"
     sed -i 's#/home  xfs   defaults#/home  xfs   usrquota,grpquota#' /etc/fstab
     mount -o remount,usrquota,grpquota /home
+
+    ########################################################################
+    log "Disable hibernate and suspend mode"
+    systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
     ########################################################################
     log "Timeserver setup"

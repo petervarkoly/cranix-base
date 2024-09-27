@@ -24,6 +24,7 @@ from ._functions import check_password
 from ._functions import read_birthday
 from ._functions import print_error
 from ._functions import print_msg
+from ._functions import create_secure_pw
 
 # Internal debug only
 init_debug = False

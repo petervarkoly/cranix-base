@@ -8,6 +8,7 @@ PYTHONSITEARCH  = /usr/lib/python3.6/site-packages/
 TOPACKAGE       = Makefile addons cups etc plugins python software sbin setup salt tools templates updates README.md
 HERE            = $(shell pwd)
 REPO            = /data1/OSC/home:pvarkoly:CRANIX
+REPO2           = /data1/OSC/home:pvarkoly:CRANIX:leap15.6
 PACKAGE         = cranix-base
 
 install:
@@ -22,7 +23,6 @@ install:
 	mkdir -p $(DESTDIR)/srv/salt/_modules/
 	mkdir -p $(DESTDIR)/usr/share/cups/
 	mkdir -p $(DESTDIR)/usr/lib/rpm/gnupg/keys/
-	mkdir -p $(DESTDIR)/usr/lib/systemd/system/firewalld.service.d/
 	mkdir -p $(DESTDIR)/var/adm/cranix/running
 	install -m 644 setup/cranix      $(DESTDIR)/$(FILLUPDIR)/sysconfig.cranix
 	rm -f setup/cranix
@@ -36,7 +36,7 @@ install:
 	rsync -a   $(SHARE)/setup/systemd/  $(DESTDIR)/usr/lib/systemd/system/
 	rsync -a   templates/       $(SHARE)/templates/
 	install -m 755   tools/*    $(SHARE)/tools/
-	install -m 755   updates/*  $(SHARE)/updates/
+	#install -m 755   updates/*  $(SHARE)/updates/
 	rsync -a   salt/            $(DESTDIR)/srv/salt/
 	rsync -a   cups/            $(DESTDIR)/usr/share/cups/
 	rsync -a   python/          $(DESTDIR)/$(PYTHONSITEARCH)/cranix/
@@ -61,6 +61,11 @@ dist:
 	   cd $(REPO)/$(PACKAGE); \
 	   osc vc; \
 	   osc ci -m "New Build Version"; \
+	fi
+	if [ "$(REPO2)" ]; then \
+	   cp $(REPO)/$(PACKAGE)/$(PACKAGE).tar.bz2 $(REPO2)/$(PACKAGE); \
+	   cp $(REPO)/$(PACKAGE)/$(PACKAGE).changes $(REPO2)/$(PACKAGE); \
+	   cd $(REPO2)/$(PACKAGE); osc ci -m "New Build Version"; \
 	fi
 
 
