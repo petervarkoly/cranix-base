@@ -250,8 +250,7 @@ def close_on_error(msg):
 def prep_log_head():
     global new_users, del_users, moved_users, stand_users, new_groups, del_groups
     if len(logs) == 0:
-        logs.append("<html><head><style> table, th, td { border: 1px solid black; border-collapse: collapse; margin: 5px; padding-left: 5px; padding-right: 5px; }</style></head><body>")
-        logs.append("<table><caption>Statistic</caption>\n")
+        logs.append('<table><caption>Statistic</caption>\n')
         logs.append("<tr><td>New Users</td><td>{0}</td></tr>\n".format(len(new_users)))
         logs.append("<tr><td>Deleted Users</td><td>{0}</td></tr>\n".format(len(del_users)))
         logs.append("<tr><td>Moved Users</td><td>{0}</td></tr>\n".format(len(moved_users)))
@@ -259,20 +258,20 @@ def prep_log_head():
         logs.append("<tr><td>New Groups</td><td>{0}</td></tr>\n".format(len(new_groups)))
         logs.append("<tr><td>Deleted Groups</td><td>{0}</td></tr>\n".format(len(del_groups)))
         logs.append("</table>\n")
-        logs.append("<table><caption>Import Log</caption>\n")
-        logs.append("</table></body></html>\n")
+        logs.append('<table><caption>Import Log</caption>\n')
+        logs.append("</table>\n")
     else:
-        logs[2] = "<tr><td>New Users</td><td>{0}</td></tr>\n".format(len(new_users))
-        logs[3] = "<tr><td>Deleted Users</td><td>{0}</td></tr>\n".format(len(del_users))
-        logs[4] = "<tr><td>Moved Users</td><td>{0}</td></tr>\n".format(len(moved_users))
-        logs[5] = "<tr><td>Standing Users</td><td>{0}</td></tr>\n".format(len(stand_users))
-        logs[6] = "<tr><td>New Groups</td><td>{0}</td></tr>\n".format(len(new_groups))
-        logs[7] = "<tr><td>Deleted Groups</td><td>{0}</td></tr>\n".format(len(del_groups))
+        logs[1] = "<tr><td>New Users</td><td>{0}</td></tr>\n".format(len(new_users))
+        logs[2] = "<tr><td>Deleted Users</td><td>{0}</td></tr>\n".format(len(del_users))
+        logs[3] = "<tr><td>Moved Users</td><td>{0}</td></tr>\n".format(len(moved_users))
+        logs[4] = "<tr><td>Standing Users</td><td>{0}</td></tr>\n".format(len(stand_users))
+        logs[5] = "<tr><td>New Groups</td><td>{0}</td></tr>\n".format(len(new_groups))
+        logs[6] = "<tr><td>Deleted Groups</td><td>{0}</td></tr>\n".format(len(del_groups))
 
 def log_error(msg):
     global logs
     prep_log_head()
-    logs[len(logs)-1] = print_error(msg)
+    logs.insert(9,print_error(msg))
     logs.append("</table></body></html>\n")
     with open(import_dir + '/import.log','w') as output:
         output.writelines(logs)
@@ -280,8 +279,7 @@ def log_error(msg):
 def log_msg(title,msg):
     global logs
     prep_log_head()
-    logs[len(logs)-1] = print_msg(title, msg)
-    logs.append("</table></body></html>\n")
+    logs.insert(9,print_msg(title, msg))
     with open(import_dir + '/import.log','w') as output:
         output.writelines(logs)
 
