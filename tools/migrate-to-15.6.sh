@@ -2,6 +2,12 @@
 . /etc/sysconfig/cranix
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
 /usr/share/cranix/tools/register.sh
+
+if [ -z "$( zypper lr | grep CRANIX )" ]; then
+	echo "Can not register the server. We do not start the migration."
+	exit
+fi
+
 sed -i s/4.5/15.6/ /etc/zypp/credentials.cat
 zypper ar /usr/share/cranix/setup/openLeap.repos
 for i in /etc/zypp/repos.d/*.repo
