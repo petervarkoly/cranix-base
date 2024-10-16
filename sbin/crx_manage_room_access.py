@@ -125,15 +125,19 @@ def set_state(room):
     name    = room['name']
     network = room['network']
     if args.set_defaults:
-        access = default_access[room['id']]
-        log_debug(access)
-        if 'printing' in access:
-            allow_printing = access['printing']
-            allow_login    = access['login']
-            allow_portal   = access['portal']
-            allow_proxy    = access['proxy']
-            allow_direct   = access['direct']
-        else:
+        try:
+            access = default_access[room['id']]
+            log_debug(access)
+            if 'printing' in access:
+                allow_printing = access['printing']
+                allow_login    = access['login']
+                allow_portal   = access['portal']
+                allow_proxy    = access['proxy']
+                allow_direct   = access['direct']
+            else:
+                log_debug("No default access for room {0}".format(name))
+                return
+        except KeyError:
             log_debug("No default access for room {0}".format(name))
             return
 
