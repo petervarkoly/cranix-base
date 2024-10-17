@@ -8,11 +8,11 @@ if [ -z "$( zypper lr | grep CRANIX )" ]; then
 	exit
 fi
 
-sed -i s/4.5/15.6/ /etc/zypp/credentials.cat
+sed -i 's/4\.5/15.6/' /etc/zypp/credentials.cat
 zypper ar /usr/share/cranix/setup/openLeap.repos
 for i in /etc/zypp/repos.d/*.repo
 do
-	sed -i s/4.5/15.6/ $i
+	sed -i 's/4\.5/15.6/' $i
 	sed -i s/VERSION_ID/15.6/ $i
 done
 /usr/bin/zypper ref
