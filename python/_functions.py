@@ -60,10 +60,10 @@ def create_secure_pw(l):
     return pw
 
 def print_error(msg):
-    return '<font color="red">{0}</font></br>\n'.format(msg)
+    return '<tr><td colspan="2"><font color="red">{0}</font></td></tr>\n'.format(msg)
 
 def print_msg(title, msg):
-    return '<b>{0}</b>{1}</br>\n'.format(title,msg)
+    return '<tr><td>{0}</td><td>{1}</td></tr>\n'.format(title,msg)
 
 def check_uid(uid: str):
     if len(uid) < 2:

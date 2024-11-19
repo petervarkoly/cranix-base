@@ -22,7 +22,7 @@ fi
 
 rm /etc/zypp/repos.d/*
 #Save the credentials
-echo "[${CRANIX_UPDATE_URL}/${NAME}/${VERSION_ID}]
+echo "[${CRANIX_UPDATE_URL}/CRANIX/${VERSION_ID}]
 username = ${REPO_USER}
 password = ${REPO_PASSWORD}
 
@@ -51,11 +51,11 @@ zypper -D /srv/salt/repos.d/ ar -G /tmp/salt-packages.repo
 
 zypper --gpg-auto-import-keys -D /srv/salt/repos.d/ ref
 
-echo "[${NAME}]
-name=${NAME}
+echo "[CRANIX]
+name=CRANIX
 enabled=1
 autorefresh=1
-baseurl=${CRANIX_UPDATE_URL}/${NAME}/$VERSION_ID
+baseurl=${CRANIX_UPDATE_URL}/CRANIX/$VERSION_ID
 path=/
 type=rpm-md
 keeppackages=0
