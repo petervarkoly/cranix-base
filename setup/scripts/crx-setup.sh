@@ -512,20 +512,12 @@ chmod 600 /root/.my.cnf
     ANON_NETMASK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $2 }' )
     if [ "$CRANIX_TYPE" = "cephalix"  ]; then
         /usr/bin/systemctl stop cephalix-api
-        /usr/bin/systemctl start cephalix-api
-	sleep 10
-	/usr/share/cranix/tools/wait-for-api.sh
 	sleep 5
-        /usr/bin/systemctl stop cephalix-api
     else
         /usr/bin/systemctl stop cranix-api
-        /usr/bin/systemctl start cranix-api
-	sleep 10
-	/usr/share/cranix/tools/wait-for-api.sh
 	sleep 5
-        /usr/bin/systemctl stop cranix-api
     fi
-
+    mysql < /opt/cranix-java/data/crx-objects.sql
     for i in /opt/cranix-java/data/*-inserts.sql
     do
 	sed -i "s/#SERVER_NETWORK#/${SERVER_NETWORK}/g"		$i
