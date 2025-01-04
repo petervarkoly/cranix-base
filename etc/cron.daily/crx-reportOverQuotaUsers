@@ -5,7 +5,7 @@ if [ -e /run/overquota ]; then
         [ -d /home/groups/SYSADMINS/SearchUsersFiles ] && rm -f /home/groups/SYSADMINS/SearchUsersFiles/*
         for u in $(cat /run/overquota)
         do
-                /usr/share/cranix/tools/find_files_of_user.sh --uid=${u}
+                /usr/share/cranix/tools/find_files_of_user.sh --uid=${u,,} &> /dev/null
         done
 fi
 
