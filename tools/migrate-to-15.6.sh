@@ -11,7 +11,8 @@ fi
 sed -i 's/4\.5/15.6/' /etc/zypp/credentials.cat
 zypper ar /usr/share/cranix/setup/openLeap.repos
 rpm -e $( zypper se -i libreoffice |  gawk '{ print $3 }' | grep libreoffice )
-rpm -e apparmor-parser-lang
+rpm -e -f apparmor-parser-lang
+rpm -e -f apparmor-profiles
 for i in /etc/zypp/repos.d/*.repo
 do
 	sed -i 's/4\.5/15.6/' $i
