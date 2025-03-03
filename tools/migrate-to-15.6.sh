@@ -1,8 +1,10 @@
 #!/bin/bash -x
 . /etc/sysconfig/cranix
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
+rpm -e  $( rpm -qa "libreoffice*" )
+rpm -e -f apparmor-parser-lang
+rpm -e -f apparmor-profiles
 /usr/share/cranix/tools/register.sh
-
 if [ -z "$( zypper lr | grep CRANIX )" ]; then
 	echo "Can not register the server. We do not start the migration."
 	exit
@@ -10,9 +12,6 @@ fi
 
 sed -i 's/4\.5/15.6/' /etc/zypp/credentials.cat
 zypper ar /usr/share/cranix/setup/openLeap.repos
-rpm -e $( zypper se -i libreoffice |  gawk '{ print $3 }' | grep libreoffice )
-rpm -e -f apparmor-parser-lang
-rpm -e -f apparmor-profiles
 for i in /etc/zypp/repos.d/*.repo
 do
 	sed -i 's/4\.5/15.6/' $i
