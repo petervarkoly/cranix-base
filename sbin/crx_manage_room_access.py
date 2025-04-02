@@ -238,6 +238,11 @@ def read_data():
         sys.exit(-1)
     for line in os.popen("/usr/sbin/iptables  -nL -t nat").readlines():
         tmp = line.split()
+        if len(tmp) > 0 and tmp[0] == "DROP" and tmp[3] in rooms:
+            if tmp[4] == proxy:
+                rooms[tmp[3]]['proxy'] = False
+            if tmp[4] == portal:
+                rooms[tmp[3]]['portal'] = False
         if len(tmp) > 0 and ((tmp[0] == "SNAT" or tmp[0] == "MASQUERADE") and tmp[3] in rooms):
             rooms[tmp[3]]['direct'] = True
     log_debug(rooms)
