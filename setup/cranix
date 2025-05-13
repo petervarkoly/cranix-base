@@ -386,8 +386,9 @@ CRANIX_LOGON_CONNECT_PRINTERS="yes"
 
 ## Type:        yesno
 ## Default:     yes
-# If this variable is yes the admin website allows the browser to use the saved passwords.
-CRANIX_ALLOW_SAVE_PASSWORD="no"
+# If this variable is yes then /home/software will be linked into the home directory also
+# This is only important if you want the people have acces to /home/software via cranix-cloud (webDAV).
+CRANIX_LINK_SOFTWARE="no"
 
 ## Type:        yesno
 ## Default:     no
