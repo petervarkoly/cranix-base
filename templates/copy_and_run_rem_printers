@@ -1,3 +1,3 @@
 copy \\#FILE-SERVER#\software\cranix\remPrinters.ps1 Z:\remPrinters.ps1
 Powershell.exe -executionpolicy remotesigned "Z:\remPrinters.ps1"
-del /Q /S Z:\remPrinters.ps1
+del /Q Z:\remPrinters.ps1
