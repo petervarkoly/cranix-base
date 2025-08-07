@@ -77,8 +77,8 @@ while [ "$1" != "" ]; do
     shift
 done
 . /etc/sysconfig/cranix
-FILE=`/usr/bin/mktemp /tmp/crx_del_user_filesXXX`
-DATUM=`/usr/share/cranix/tools/crx_date.sh`
+FILE=$( /usr/bin/mktemp /tmp/crx_del_user_filesXXX )
+DATUM=$( /usr/share/cranix/tools/crx_date.sh )
 
 if [ -d $HOMEDIR ]
 then

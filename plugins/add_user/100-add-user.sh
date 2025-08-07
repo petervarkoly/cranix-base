@@ -182,8 +182,3 @@ fi
 
 /usr/sbin/crx_set_quota.sh $uid $fsquota
 
-# Set mailsystem quota
-if [ "$role" != "workstations" -a "$role" != "guests" ]; then
-	/usr/sbin/crx_set_mquota.pl $uid $msquota
-fi
-

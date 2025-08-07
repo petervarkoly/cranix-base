@@ -1,13 +1,11 @@
 #!/bin/bash
-# Copyright 2018 Peter Varkoly <peter@varkoly.de>
-export PATH="/sbin:/usr/sbin:/usr/local/sbin:/root/bin:/usr/local/bin:/usr/bin:/bin"
+# Copyright 2025 Peter Varkoly <pvarkoly@cephalix.et>
 
-. /etc/sysconfig/cranix
-
-export HOME="/root"
 (
-        echo "select uid from Users" | mysql CRX  | /usr/sbin/crx_get_mquotas.pl
+for user in $( /usr/sbin/crx_get_all_user.sh )
+do
+        echo -n "$user "
+        /usr/sbin/crx_get_mquota.sh $user
+done
 ) | gawk -f /usr/share/cranix/tools/quota.awk > /tmp/mquotalist
-TOKEN=$( grep de.cranix.api.auth.localhost= /opt/cranix-java/conf/cranix-api.properties | sed 's/de.cranix.api.auth.localhost=//' )
-curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' --header 'Authorization: Bearer '${TOKEN} -d '@/tmp/mquotalist' 'http://localhost:9080/api/users/syncMsQuotas'
-
+/usr/sbin/crx_api_post_file.sh users/syncMsQuotas /tmp/mquotalist

@@ -82,9 +82,6 @@ done
 #Set fsquota
 /usr/sbin/crx_set_quota.sh $uid $fsquota
 
-#Set mailsystem quota
-/usr/sbin/crx_set_mquota.pl $uid $msquota
-
 if [ "$surname" -a "$givenname" ]
 then
 
