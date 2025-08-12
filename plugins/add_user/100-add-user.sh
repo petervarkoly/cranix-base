@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2018 Peter Varkoly Nürnberg, Germany.  All rights reserved.
+# Copyright (c) 2025 Peter Varkoly Nürnberg, Germany.  All rights reserved.
 #
 
 if [ ! -e /etc/sysconfig/cranix ]; then
