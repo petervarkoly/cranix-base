@@ -3,29 +3,9 @@
 # Copyright (C) Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 #
 
-from xhtml2pdf import pisa             # import python module
 import sys
 import csv
 import os
-try:
-    from html import escape  # python 3.x
-except ImportError:
-    from cgi import escape
-
-def convertHtmlToPdf(sourceHtml, outputFilename):
-    # open output file for writing (truncated binary)
-    resultFile = open(outputFilename, "w+b")
-
-    # convert HTML to PDF
-    pisaStatus = pisa.CreatePDF(
-            sourceHtml,                # the HTML to convert
-            dest=resultFile)           # file handle to recieve result
-
-    # close output file
-    resultFile.close()                 # close output file
-
-    # return True on success and False on errors
-    return pisaStatus.err
 
 import_dir= sys.argv[1] + "/"
 role      = sys.argv[2]
@@ -56,10 +36,10 @@ with open(user_list) as csvfile:
                 group=row[field].split(' ')[0]
                 if group not in all_classes:
                     all_classes.append(group)
+        fileName = f"{import_dir}/passwordfiles/{uid}"
         if role == 'students':
-           convertHtmlToPdf(template, import_dir + "/passwordfiles/" + group + "-" + uid + '.pdf')
-        else:
-           convertHtmlToPdf(template, import_dir + "/passwordfiles/" + uid + '.pdf')
+            fileName = f"{import_dir}/passwordfiles/{group}-{uid}"
+        os.system(f"/usr/bin/htmldoc --no-title --no-toc --charset utf-8 -f {fileName}.pdf {fileName}.html")
 
 if role == 'students':
   for group in all_classes:
