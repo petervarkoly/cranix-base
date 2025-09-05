@@ -19,7 +19,7 @@ def read_birthday(bd):
         if lbd == 8:
             y=bd[:4]
             m=bd[4:6]
-            d=bd[7:]
+            d=bd[6:]
         else:
             raise SyntaxError("Bad birthday format:" + bd)
     elif(len(l_bd[0]) == 4 ):
