@@ -476,6 +476,6 @@ def write_user_list():
     os.system('/usr/share/cranix/tools/create_password_files.py {0} {1}'.format(import_dir,role))
 
     #Now we handle AdHocRooms:
-    if class_adhoc:
+    if class_adhoc and role == 'students':
         os.system('/usr/sbin/crx_api.sh PATCH users/moveStudentsDevices')
 
