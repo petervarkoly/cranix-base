@@ -10,8 +10,12 @@ do
    then
       if ! /usr/bin/systemctl is-active $i &> /dev/null
       then
-         echo "crx_check_services.sh start $i"
-         /usr/bin/systemctl start $i
+         if [ ${CRANIX_DEBUG^^} = "YES" ]; then
+             echo "crx_check_services.sh start $i"
+             /usr/bin/systemctl start $i
+         else
+             /usr/bin/systemctl start $i &> /dev/null
+         fi
       fi
    fi
 done
