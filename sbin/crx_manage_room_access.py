@@ -212,6 +212,7 @@ def prepare_room(room):
     return room
 
 def read_data():
+    global login_denied_rooms
     config.read('/etc/samba/smb.conf')
     printc.read(print_config_file)
 
