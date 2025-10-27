@@ -2,6 +2,7 @@
 
 import cranixconfig
 import json
+import netifaces
 import os
 
 def netzwerk_zuordnen_netifaces():
@@ -47,7 +48,6 @@ def netzwerk_zuordnen_netifaces():
 
     return ergebnisse
 
-net_cards = netzwerk_zuordnen_netifaces()
 
 network = f"{cranixconfig.CRANIX_NETWORK}/{cranixconfig.CRANIX_NETMASK}"
 network_counter = 1
@@ -65,11 +65,12 @@ except Error:
     pass
 
 dhcp_devices = []
-
+net_cards = netzwerk_zuordnen_netifaces()
 for net in net_cards:
     if net in networks:
         dhcp_devices.puss(net_cards[net][dev])
 
+password==os.popen("mktemp -u XXXXXXXXXXX").read().strip()
 kea_conf = {
     "Dhcp4": {
         "interfaces-config": {
@@ -83,7 +84,7 @@ kea_conf = {
             "type": "mysql",
             "name": "kea_dhcp4",
             "user": "keauser",
-            "password": "Bartok12#34",
+            "password": f"{password}",
             "host": "localhost",
             "port": 3306
         },
@@ -91,7 +92,7 @@ kea_conf = {
             "type": "mysql",
             "name": "kea_dhcp4",
             "user": "keauser",
-            "password": "Bartok12#34",
+            "password": f"{password}",
             "host": "localhost",
             "port": 3306
         },
@@ -99,7 +100,7 @@ kea_conf = {
             {
                 "name": "pxe-bios",
                 "test": "option[vendor-class-identifier].text == 'PXEClient:Arch:00000:UNDI:002001'",
-                "next-server": "172.18.0.2",
+                "next-server": f"{cranixconfig.CRANIX_SERVER}",
                 "boot-file-name": "pxelinux.0"
             }
         ],
@@ -124,3 +125,6 @@ for net in networks:
     if networks[net] == 1:
         subnet["pools"] = [ { "pool": cranixconfig.CRANIX_ANON_DHCP_RANGE.replace(" "," - ") } ]
     kea_conf["Dhcp4"]["subnet4"].push(subnet)
+
+with open("/etc/kea/kea.conf","w") as cf:
+    cf.write(json.dumps(kea_conf, sort_keys=True, ensure_ascii=False))
