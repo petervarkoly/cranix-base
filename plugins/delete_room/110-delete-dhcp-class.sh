@@ -36,13 +36,9 @@ done
 
 cat << EOF | socat UNIX:/run/kea/kea4-ctrl-socket -,ignoreeof
 {
-    "command": "class-add",
-    "service": [ "dhcp4" ],
+    "command": "class-del",
     "arguments": {
-        "client-classes": [ {
-           "name": "$name",
-           "test": "'a' == 'a'"
-        } ]
+        "name": "$name"
     }
 }
 EOF

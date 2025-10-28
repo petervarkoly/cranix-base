@@ -68,7 +68,7 @@ for net in kea_config["Dhcp4"]["subnet4"]:
         break
 
 dhcp_command = {
-    "command": "reservation-add",
+    "command": "reservation-update",
     "arguments": {
         "reservation": {
             "subnet-id": net_id,
@@ -87,7 +87,7 @@ result = subprocess.run(
         check=True
     )
 if result['result'] != 0:
-    with open(f"/var/adm/cranix/opentasks/110-add-device-to-dhcp-{dev_id}.json","w") as f:
+    with open(f"/var/adm/cranix/opentasks/110-modify-device-in-dhcp-{dev_id}.json","w") as f:
         json.dump(dhcp_command, f, ensure_ascii=False, indent=4)
 
 print(result.stdout)
@@ -103,5 +103,5 @@ if is_valid_ipv4(wlanip) and is_valid_mac_macaddress(wlanmac):
             check=True
         )
     if result['result'] != 0:
-        with open(f"/var/adm/cranix/opentasks/110-add-device-to-dhcp-wlan-{dev_id}.json","w") as f:
+        with open(f"/var/adm/cranix/opentasks/110-modify-device-in-dhcp-wlan-{dev_id}.json","w") as f:
             json.dump(dhcp_command, f, ensure_ascii=False, indent=4)

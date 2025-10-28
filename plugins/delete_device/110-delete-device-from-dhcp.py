@@ -68,16 +68,14 @@ for net in kea_config["Dhcp4"]["subnet4"]:
         break
 
 dhcp_command = {
-    "command": "reservation-add",
+    "command": "reservation-del",
     "arguments": {
-        "reservation": {
-            "subnet-id": net_id,
-            "hw-address": mac,
-            "ip-address": ip,
-            "hostname": f"{name}.{cranixconfig.CRANIX_DOMAIN}",
-            "client-classes": [roomname]
-        }
-     }
+        "subnet-id": net_id,
+        "ip-address": ip,
+        "identifier-type": 'hw-address',
+        "identifier": mac,
+        "operation-target": "all"
+    }
 }
 
 result = subprocess.run(
@@ -87,15 +85,14 @@ result = subprocess.run(
         check=True
     )
 if result['result'] != 0:
-    with open(f"/var/adm/cranix/opentasks/110-add-device-to-dhcp-{dev_id}.json","w") as f:
+    with open(f"/var/adm/cranix/opentasks/110-delete-device-from-dhcp-{dev_id}.json","w") as f:
         json.dump(dhcp_command, f, ensure_ascii=False, indent=4)
 
 print(result.stdout)
 
 if is_valid_ipv4(wlanip) and is_valid_mac_macaddress(wlanmac):
-    dhcp_command["arguments"]["reservation"]["hw-address"] = wlanmac
-    dhcp_command["arguments"]["reservation"]["ip-address"] = wlanip
-    dhcp_command["arguments"]["reservation"]["hostname"] = f"{name}-wlan.{cranixconfig.CRANIX_DOMAIN}"
+    dhcp_command["arguments"]["hw-address"] = wlanmac
+    dhcp_command["arguments"]["ip-address"] = wlanip
     result = subprocess.run(
             ['/usr/bin/socat', 'UNIX:/run/kea/kea4-ctrl-socket', '-,ignoreeof'],
             input=json.dumps(dhcp_command),
@@ -103,5 +100,5 @@ if is_valid_ipv4(wlanip) and is_valid_mac_macaddress(wlanmac):
             check=True
         )
     if result['result'] != 0:
-        with open(f"/var/adm/cranix/opentasks/110-add-device-to-dhcp-wlan-{dev_id}.json","w") as f:
+        with open(f"/var/adm/cranix/opentasks/110-delete-device-from-dhcp-wlan-{dev_id}.json","w") as f:
             json.dump(dhcp_command, f, ensure_ascii=False, indent=4)
