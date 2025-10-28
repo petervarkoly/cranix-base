@@ -166,7 +166,7 @@ for device in json.load(os.popen('crx_api.sh GET devices/all')):
     print(tmp)
     if device['mac'] != "":
         ergebnis = subprocess.run(
-            "/usr/share/cranix/plugins/add_device/110-add-device-to-dhcp.sh",
+            "/usr/share/cranix/plugins/add_device/110-add-device-to-dhcp.py",
             input = tmp, 
             encoding='utf-8',
             check=True             # Löst eine Ausnahme aus, wenn der Befehl fehlschlägt
