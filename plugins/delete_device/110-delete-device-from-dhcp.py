@@ -72,8 +72,7 @@ dhcp_command = {
     "arguments": {
         "subnet-id": net_id,
         "ip-address": ip,
-        "identifier-type": 'hw-address',
-        "identifier": mac,
+        "identifier-type": 'ip-address',
         "operation-target": "all"
     }
 }
@@ -91,7 +90,6 @@ if result['result'] != 0:
 print(result.stdout)
 
 if is_valid_ipv4(wlanip) and is_valid_mac_macaddress(wlanmac):
-    dhcp_command["arguments"]["hw-address"] = wlanmac
     dhcp_command["arguments"]["ip-address"] = wlanip
     result = subprocess.run(
             ['/usr/bin/socat', 'UNIX:/run/kea/kea4-ctrl-socket', '-,ignoreeof'],

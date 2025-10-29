@@ -38,6 +38,18 @@ def ip_in_network(ip: str, network: str) -> bool:
     net = ipaddress.ip_network(network, strict=False)  # strict=False erlaubt Hosts, Netzadresse oder Broadcast
     return ip_addr in net
 
+def exec_dhcp_command(dhcp_command):
+    subp =  subprocess.run(
+        ['/usr/bin/socat', 'UNIX:/run/kea/kea4-ctrl-socket', '-,ignoreeof'],
+        input=json.dumps(dhcp_command),
+        stderr=subprocess.STDOUT,
+        stdout=subprocess.PIPE,
+        encoding='utf-8',
+        check=True
+    )
+    return json.loads(subp.stdout)
+
+
 #Read parameters from input
 for line in sys.stdin:
     kv  = line.rstrip().split(": ",1)
@@ -67,41 +79,81 @@ for net in kea_config["Dhcp4"]["subnet4"]:
         net_id = net["id"]
         break
 
+#Search old entry
 dhcp_command = {
-    "command": "reservation-update",
+    "command": "reservation-get-by-address",
     "arguments": {
-        "reservation": {
-            "subnet-id": net_id,
-            "hw-address": mac,
-            "ip-address": ip,
-            "hostname": f"{name}.{cranixconfig.CRANIX_DOMAIN}",
-            "client-classes": [roomname]
-        }
+        "ip-address": ip
+    }
+}
+result = exec_dhcp_command(dhcp_command)
+if result['result'] != 0:
+    with open(f"/var/adm/cranix/opentasks/110-modify-device-in-dhcp-{dev_id}.json","w") as f:
+        json.dump(dhcp_command, f, ensure_ascii=False, indent=4)
+    sys.exit(1)
+host = result["arguments"]["hosts"][0]
+host["hw-address"] = mac
+
+#Delete old entry
+dhcp_command = {
+    "command": "reservation-del",
+    "arguments": {
+        "subnet-id": host["subnet-id"],
+        "ip-address": ip,
+        "identifier-type": "ip-address",
+        "operation-target": "all"
+    }
+}
+result = exec_dhcp_command(dhcp_command)
+
+#Add updated entry
+dhcp_command = {
+    "command": "reservation-add",
+    "arguments": {
+        "reservation": host
      }
 }
-
-result = subprocess.run(
-        ['/usr/bin/socat', 'UNIX:/run/kea/kea4-ctrl-socket', '-,ignoreeof'],
-        input=json.dumps(dhcp_command),
-        encoding='utf-8',
-        check=True
-    )
+result = exec_dhcp_command(dhcp_command)
 if result['result'] != 0:
     with open(f"/var/adm/cranix/opentasks/110-modify-device-in-dhcp-{dev_id}.json","w") as f:
         json.dump(dhcp_command, f, ensure_ascii=False, indent=4)
 
-print(result.stdout)
-
 if is_valid_ipv4(wlanip) and is_valid_mac_macaddress(wlanmac):
-    dhcp_command["arguments"]["reservation"]["hw-address"] = wlanmac
-    dhcp_command["arguments"]["reservation"]["ip-address"] = wlanip
-    dhcp_command["arguments"]["reservation"]["hostname"] = f"{name}-wlan.{cranixconfig.CRANIX_DOMAIN}"
-    result = subprocess.run(
-            ['/usr/bin/socat', 'UNIX:/run/kea/kea4-ctrl-socket', '-,ignoreeof'],
-            input=json.dumps(dhcp_command),
-            encoding='utf-8',
-            check=True
-        )
+    #Search old entry
+    dhcp_command = {
+        "command": "reservation-get-by-address",
+        "arguments": {
+            "ip-address": wlanip
+        }
+    }
+    result = exec_dhcp_command(dhcp_command)
     if result['result'] != 0:
-        with open(f"/var/adm/cranix/opentasks/110-modify-device-in-dhcp-wlan-{dev_id}.json","w") as f:
+        with open(f"/var/adm/cranix/opentasks/110-modify-device-in-dhcp-{dev_id}-wlan.json","w") as f:
+            json.dump(dhcp_command, f, ensure_ascii=False, indent=4)
+        sys.exit(1)
+    host = result["arguments"]["hosts"][0]
+    host["hw-address"] = wlanmac
+
+    #Delete old entry
+    dhcp_command = {
+        "command": "reservation-del",
+        "arguments": {
+            "subnet-id": host["subnet-id"],
+            "ip-address": wlanip,
+            "identifier-type": "ip-address",
+            "operation-target": "all"
+        }
+    }
+    result = exec_dhcp_command(dhcp_command)
+
+    #Add updated entry
+    dhcp_command = {
+        "command": "reservation-add",
+        "arguments": {
+            "reservation": host
+         }
+    }
+    result = exec_dhcp_command(dhcp_command)
+    if result['result'] != 0:
+        with open(f"/var/adm/cranix/opentasks/110-modify-device-in-dhcp-{dev_id}-wlan.json","w") as f:
             json.dump(dhcp_command, f, ensure_ascii=False, indent=4)
