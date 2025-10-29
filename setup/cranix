@@ -1,0 +1,430 @@
+########################################################################
+## Path:           Network/Server
+## Description:    Basic Configuration of the CRANIX
+########################################################################
+
+########################################################################
+## Path:        Network/Server/Backup
+## Description: Configuration of the CRANIX: Backup
+########################################################################
+
+## Type:	yesno
+## Default:	no
+# Make backup from the CRANIX.
+CRANIX_BACKUP="no"
+
+## Type:        string
+## Default:     1234567
+# On which day make backup from the CRANIX.
+CRANIX_BACKUP_DAYS="123456"
+
+## Type:	yesno
+## Default:	no
+# Set this variable to yes if your backup medium can not save file access control lists (ACLs).
+CRANIX_BACKUP_CAN_NOT_SAVE_ACL="no"
+
+## Type:        yesno
+## Default:     no
+# Set this variable to yes if your backup medium can not save file owner and rights.
+CRANIX_BACKUP_CAN_NOT_SAVE_OWNER="no"
+
+## Type:        string
+## Default:
+# Space separated list of custom scripts with full path which will be executed just before the command in CRANIX_BACKUP_STOP_CMD.
+CRANIX_BACKUP_CUSTOM_SCRIPTS=""
+
+## Type:	yesno
+## Default:	yes
+# Do we have to check if the backup directories are mounted.
+CRANIX_BACKUP_CHECK_MOUNT="yes"
+
+## Type:	yesno
+## Default:	yes
+# Make backup from the ctool images and configuration.
+CRANIX_BACKUP_CTOOL="yes"
+
+## Type:	yesno
+## Default:	yes
+# Make backup from the SQL databases.
+CRANIX_BACKUP_DB="yes"
+
+## Type:	string
+## Default:
+# The path to the directory of the full backup.
+CRANIX_BACKUP_FULL_DIR="/mnt/backup"
+
+## Type:	yesno
+## Default:	yes
+# Make backup from /home.
+CRANIX_BACKUP_HOME="yes"
+
+## Type:	string
+## Default:
+# The path to the directory of the incremental backups.
+CRANIX_BACKUP_INC_DIR="/mnt/backup"
+
+## Type:	yesno
+## Default:	yes
+# Make backup from mail system.
+CRANIX_BACKUP_MAIL="yes"
+
+## Type:        string
+## Default:
+# Custom parameter for rsync. This will override all standard parameter.
+CRANIX_BACKUP_RSYNCPARS=""
+
+## Type:        string
+## Default:
+# Shell command to execut the backup is started.
+CRANIX_BACKUP_START_CMD="mount -o rw,acl backup:/backup /mnt/backup"
+
+## Type:        string
+## Default:
+# Shell command to execute after the backup is stoped.
+CRANIX_BACKUP_STOP_CMD="umount /mnt/backup"
+
+## Type:        integer
+## Default:     80
+# Is the backup medium more filled in percent admin will get a warning mail.
+CRANIX_BACKUP_WARNING_LIMIT="80"
+
+## Type:        yesno
+## Default:     no
+# Should create backup with hardlinks. It is possible only if CRANIX_BACKUP_FULL_DIR
+# and CRANIX_BACKUP_INC_DIR are the same.
+CRANIX_BACKUP_WITH_HARDLINK="no"
+
+########################################################################
+## Path:        Network/Server/Basic
+## Description: Configuration of the CRANIX: Basic
+########################################################################
+
+## Type:	string readonly
+# Network Address of the internal network.
+CRANIX_NETWORK=""
+
+## Type:	string readonly
+# Network Mask of the internal network.
+CRANIX_NETMASK=""
+
+## Type:	string readonly
+# Network Mask of the internal network.
+CRANIX_NETMASK_STRING=""
+
+## Type:	yesno readonly
+# The CRANIX is the DHCP server in the internal network.
+CRANIX_USE_DHCP="yes"
+
+## Type:        string readonly
+# DNS Domain of the institute.
+CRANIX_DOMAIN=""
+
+## Type:	string readonly
+# The windows domain name of the institute.
+CRANIX_WORKGROUP=""
+
+## Type:        string readonly
+# IP-network for new and not registered clients.
+CRANIX_ANON_DHCP_NET=""
+
+## Type:	string readonly
+# IP-address range for new and not registered clients.
+CRANIX_ANON_DHCP_RANGE=""
+
+## Type:	string readonly
+# The network address of the first institute room.
+CRANIX_FIRST_ROOM_NET=""
+
+## Type:	yesno readonly
+## Default:	yes
+# This varibale shows if the CRANIX was configured as a gateway.
+CRANIX_ISGATE="yes"
+
+## Type:	string readonly
+# The default gateway for the internal net, not for the server.
+CRANIX_NET_GATEWAY=""
+
+## Type:	string readonly
+# IP-address of the admin server of the CRANIX.
+CRANIX_SERVER=""
+
+## Type:        string readonly
+# Default:	admin
+# The windows netbios name of the CRANIX.
+CRANIX_NETBIOSNAME="admin"
+
+## Type:        string readonly
+# IP-address of the file server of the CRANIX.
+CRANIX_FILESERVER=""
+
+## Type:        string readonly
+# Name of the file server of the CRANIX.
+CRANIX_FILESERVER_NETBIOSNAME=""
+
+## Type:        string readonly
+# IP-address of the print server of the CRANIX.
+CRANIX_PRINTSERVER=""
+
+## Type:        string readonly
+# Name of the print server of the CRANIX.
+CRANIX_PRINTSERVER_NETBIOSNAME=""
+
+## Type:	string readonly
+# IP-address of the mail server and groupware of the CRANIX.
+CRANIX_MAILSERVER=""
+
+## Type:	string readonly
+# IP-address of the proxy server of the CRANIX.
+CRANIX_PROXY=""
+
+## Type:	string readonly
+# IP-address of the backup server of the CRANIX.
+CRANIX_BACKUP_SERVER=""
+
+## Type:	string readonly
+# The default gateway of the server.
+CRANIX_SERVER_EXT_GW=""
+
+## Type:	string readonly
+# The external ip address of the server.
+CRANIX_SERVER_EXT_IP=""
+
+## Type:	string readonly
+# The netmask of the external ip address of the server.
+CRANIX_SERVER_EXT_NETMASK=""
+
+## Type:	string readonly
+# The CRANIX server networks network address.
+CRANIX_SERVER_NET=""
+
+## Type:	string readonly
+## Default:	"DE"
+# Default langugage.
+CRANIX_LANGUAGE="DE"
+
+## Type:	string readonly
+## Default:	"DE"
+# Default country code.
+CRANIX_CCODE="DE"
+
+## Type:        string(dns,proxy)
+## Default:     dns
+# The type of the internet filter.
+CRANIX_INTERNET_FILTER="dns"
+
+## Type:	string readonly
+## Default:	"/home"
+# Base of the institute home directory.
+CRANIX_HOME_BASE="/home"
+
+## Type:        yesno readonly
+## Default:     yes
+# If the home directories should be sorted into role directories.
+CRANIX_SORT_HOMES="yes"
+
+## Type:        string
+## Default:     https://repo.cephalix.eu/api/tickets/add
+# The support URL of the CEPHALIX or OTRS system the ticket will be sent to via REST-API.
+# If the value is 'MAIL' the tickets will be sent via mail to SUPPORT_MAIL_ADDRESS
+CRANIX_SUPPORT_URL="https://repo.cephalix.eu/api/tickets/add"
+
+## Type:	string
+## Default:     support@cephalix.eu
+# The support email address.
+CRANIX_SUPPORT_MAIL_ADDRESS="support@cephalix.eu"
+
+## Type:        string readonly
+## Default:	http://repo.cephalix.eu/salt-packages
+# Url to the salt packages
+CRANIX_SALT_PKG_URL="http://repo.cephalix.eu/salt-packages"
+
+## Type:        string readonly
+## Default:     http://repo.cephalix.eu/CRANIX
+# Url to the updates
+CRANIX_UPDATE_URL="http://repo.cephalix.eu"
+
+########################################################################
+## Path:        Network/Server/Settings
+## Description: Configuration of the CRANIX: Settings
+########################################################################
+
+## Type:        string(primary)
+## Default:     gymnasium
+# The type of the institute using the CRANIX server.
+CRANIX_TYPE="real"
+
+## Type:        string
+## Default:     CRANIX
+# The name of the institute.
+CRANIX_NAME="CRANIX"
+
+## Type:	yesno
+## Default:	no
+# Teachers have read rights in the home directories of  the students.
+CRANIX_TEACHER_OBSERV_HOME="no"
+
+## Type:	yesno
+## Default:     no
+# When setting this variable to yes, the CRANIX scripts write debug information.
+CRANIX_DEBUG="no"
+
+## Type:	yesno
+## Default:     no
+# To increase security you can reset the password for register every day.
+CRANIX_RESET_REGISTER_PASSWORD="no"
+
+## Type:	string
+## Default:
+# This services have be monitored.
+CRANIX_MONITOR_SERVICES="amavis apache2 cups chronyd cranix-api crx_salt_event_watcher dhcpd mariadb salt-master samba-ad samba-fileserver samba-printserver squid vsftpd xinetd"
+
+## Type:	yesno
+## Default:	no
+# Set this variable to yes if you want to allow setting the same alias for more than one mailbox. This is the simpliest way to create "mailing lists".
+CRANIX_ALLOW_MULTIPLE_ALIASES="no"
+
+## Type:	integer
+## Default:	100
+# The default file system quota for students in MB.
+CRANIX_FILE_QUOTA="250"
+
+## Type:	integer
+## Default:	1000
+# The default file system quota for teachers in MB.
+CRANIX_FILE_TEACHER_QUOTA="1000"
+
+## Type:	string
+## Default:
+# The CRANIX group prefix. This charactes will be set for all group names.
+CRANIX_GROUP_PREFIX=""
+
+## Type:	string
+## Default:
+# The CRANIX login prefix. This charactes will be set for all login names.
+CRANIX_LOGIN_PREFIX=""
+
+## Type:	string
+## Default:	N4G4
+# The CRANIX login creating scheme. I.e. how many characters will be taken from the Name and from the Givenname and from birth year. Birth year can only be Y4 or Y2.
+CRANIX_LOGIN_SCHEME="N4G4"
+
+## Type:	yesno
+## Default:	default
+# If yes CRANIX creates oe from ö ue from u ae from ä and ss from ß bei creating the login
+CRANIX_LOGIN_TELEX="no"
+
+## Type:	integer
+## Default:	5
+# The default mail quota for students in MB.
+CRANIX_MAIL_QUOTA="5"
+
+## Type:	integer
+## Default:	25
+# The default mail quota for teachers in MB.
+CRANIX_MAIL_TEACHER_QUOTA="25"
+
+## Type:        string
+## Default:
+# The registration code of the CRANIX.
+CRANIX_REG_CODE="NOT YET REGISTERED"
+
+## Type:	yesno
+## Default:     yes
+# If this variable is set to yes, students may login on more than one workstation.
+CRANIX_ALLOW_STUDENTS_MULTIPLE_LOGIN="yes"
+
+## Type:	yesno
+## Default:     yes
+# If this variable is set to yes, users which are not students users may login on more than one workstation.
+CRANIX_ALLOW_MULTIPLE_LOGIN="yes"
+
+## Type:	yesno
+## Default:     yes
+# If this variable is set to yes, some directories from the windows profiles will be moved to home.
+# Documents Downloads Faworites Pictures Desktop Videos Music
+CRANIX_MOVE_PROFILE_TO_HOME="yes"
+
+## Type:        integer(10:16)
+## Default:     10
+# Maximal lenght of password. Should not be graeter then 16 if you are using Office365.
+CRANIX_MAXIMAL_PASSWORD_LENGTH="16"
+
+## Type:        integer(8:16)
+## Default:     8
+# Minimal lenght of password. Must not be less then 8 and graether then CRANIX_MAXIMAL_PASSWORD_LENGTH.
+CRANIX_MINIMAL_PASSWORD_LENGTH="8"
+
+## Type:        yesno
+## Default:     yes
+# Should the quality of the user passwort be checked for setting it? The minimal and maximal will be checked everytime.
+CRANIX_CHECK_PASSWORD_QUALITY="yes"
+
+## Type:	string(telex,simple)
+## Default:	telex
+# How to convert UTF8 string to ASCII 7bit string. Telex: ü->ue. Simple: ü->u
+CRANIX_STRING_CONVERT_TYPE="telex"
+
+## Type:	string
+## Default:	all groups
+# In which subdirectories in /home will be searched for files when deleting a user.
+CRANIX_SEARCH_FOR_DELETE="all groups"
+
+## Type:                integer
+## Default:             "90"
+# cranix-api session time out in minutes
+CRANIX_SESSION_TIMEOUT="90"
+
+## Type:        yesno
+## Default:     yes
+# Remove all network printers from the users profile by the login process
+CRANIX_CLEAN_UP_PRINTERS="yes"
+
+## Type:        yesno
+## Default:     yes
+# Should the logon script make the printer connections
+CRANIX_LOGON_CONNECT_PRINTERS="yes"
+
+## Type:        yesno
+## Default:     yes
+# If this variable is yes then /home/software will be linked into the home directory also
+# This is only important if you want the people have acces to /home/software via cranix-cloud (webDAV).
+CRANIX_LINK_SOFTWARE="no"
+
+## Type:        yesno
+## Default:     no
+# If this variable is yes adhoc rooms will be created for all classes.
+# This happens when creating a new class or by importing the stundents.
+# Existing adhoc rooms will be cleaned an filled by the exiting devices
+CRANIX_MAINTAIN_ADHOC_ROOM_FOR_CLASSES="no"
+
+## Type:                integer
+## Default:             "1"
+# How much devices may a user register in a class adhoc room
+CRANIX_CLASS_ADHOC_DEVICE_PRO_USER="2"
+
+## Type:                integer
+## Default:             "32"
+# How much devices can be registered in a class adhoc room
+CRANIX_CLASS_ADHOC_DEVICE_COUNT="64"
+
+## Type:               string
+## Default:             ""
+# The netwrork in which the AdHoc rooms will be created.
+CRANIX_CLASS_ADHOC_NETWORK=""
+
+## Type:        yesno
+## Default:     yes
+# This variable allows or disables windows clients to download updates.
+CRANIX_ALLOW_WINDOWS_UPDATES="no"
+
+## Type:        string
+## Default:
+# DNS Domain of the institute for wich official certificate was created.
+# This can be empty if this is the normal DNS domain
+CRANIX_CERT_DOMAIN=""
+
+## Type:        yesno
+## Default:     yes
+# This is the default setting for must change in the change password interface.
+CRANIX_DEFAULT_MUST_CHANGE="yes"
+
