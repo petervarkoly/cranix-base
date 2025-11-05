@@ -276,7 +276,7 @@ CRANIX_RESET_REGISTER_PASSWORD="no"
 ## Type:	string
 ## Default:
 # This services have be monitored.
-CRANIX_MONITOR_SERVICES="amavis apache2 cups chronyd cranix-api crx_salt_event_watcher dhcpd mariadb salt-master samba-ad samba-fileserver samba-printserver squid vsftpd xinetd"
+CRANIX_MONITOR_SERVICES="amavis apache2 cups chronyd cranix-api crx_salt_event_watcher kea-dhcp4 mariadb salt-master samba-ad samba-fileserver samba-printserver squid vsftpd xinetd"
 
 ## Type:	yesno
 ## Default:	no

@@ -38,6 +38,17 @@ def ip_in_network(ip: str, network: str) -> bool:
     net = ipaddress.ip_network(network, strict=False)  # strict=False erlaubt Hosts, Netzadresse oder Broadcast
     return ip_addr in net
 
+def exec_dhcp_command(dhcp_command):
+    subp =  subprocess.run(
+        ['/usr/bin/socat', 'UNIX:/run/kea/kea4-ctrl-socket', '-,ignoreeof'],
+        input=json.dumps(dhcp_command),
+        stderr=subprocess.STDOUT,
+        stdout=subprocess.PIPE,
+        encoding='utf-8',
+        check=True
+    )
+    return json.loads(subp.stdout)
+
 #Read parameters from input
 for line in sys.stdin:
     kv  = line.rstrip().split(": ",1)
@@ -77,26 +88,16 @@ dhcp_command = {
     }
 }
 
-result = subprocess.run(
-        ['/usr/bin/socat', 'UNIX:/run/kea/kea4-ctrl-socket', '-,ignoreeof'],
-        input=json.dumps(dhcp_command),
-        encoding='utf-8',
-        check=True
-    )
+result = exec_dhcp_command(dhcp_command)
 if result['result'] != 0:
     with open(f"/var/adm/cranix/opentasks/110-delete-device-from-dhcp-{dev_id}.json","w") as f:
         json.dump(dhcp_command, f, ensure_ascii=False, indent=4)
 
-print(result.stdout)
+print(result)
 
 if is_valid_ipv4(wlanip) and is_valid_mac_macaddress(wlanmac):
     dhcp_command["arguments"]["ip-address"] = wlanip
-    result = subprocess.run(
-            ['/usr/bin/socat', 'UNIX:/run/kea/kea4-ctrl-socket', '-,ignoreeof'],
-            input=json.dumps(dhcp_command),
-            encoding='utf-8',
-            check=True
-        )
+    result = exec_dhcp_command(dhcp_command)
     if result['result'] != 0:
         with open(f"/var/adm/cranix/opentasks/110-delete-device-from-dhcp-wlan-{dev_id}.json","w") as f:
             json.dump(dhcp_command, f, ensure_ascii=False, indent=4)

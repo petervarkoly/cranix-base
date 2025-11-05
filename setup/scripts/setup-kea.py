@@ -118,14 +118,38 @@ kea_conf = {
             {
                 "name": "pxe-bios",
                 "test": "option[vendor-class-identifier].text == 'PXEClient:Arch:00000:UNDI:002001'",
-                "next-server": f"{cranixconfig.CRANIX_SERVER}",
+                "next-server": cranixconfig.CRANIX_SERVER,
                 "boot-file-name": "pxelinux.0"
+            },
+            {
+                "name": "known-devices-class",
+                "test": "'a' == 'a'",
+                "max-valid-lifetime": 172800,
+                "valid-lifetime": 86400
             }
         ],
         "hooks-libraries": [ 
                 { "library": "/usr/lib64/kea/hooks/libdhcp_mysql.so" },
                 { "library": "/usr/lib64/kea/hooks/libdhcp_host_cmds.so" },
                 { "library": "/usr/lib64/kea/hooks/libdhcp_class_cmds.so" }
+        ],
+        "option-data": [
+                {
+                   "name": "domain-name-servers",
+                   "data": cranixconfig.CRANIX_SERVER
+                },
+                {
+                   "name": "domain-name",
+                   "data": cranixconfig.CRANIX_DOMAIN
+                },
+                {
+                   "name": "domain-search",
+                   "data": cranixconfig.CRANIX_DOMAIN
+                },
+                {
+                   "name": "time-servers",
+                   "data": cranixconfig.CRANIX_SERVER
+                }
         ],
         "subnet4": []
     }
@@ -138,7 +162,8 @@ for net in networks:
         "valid-lifetime": 300,
         "max-valid-lifetime": 600,
         "next-server": net_cards[net]['ip'],
-        "boot-file-name": "efi/bootx64.efi"
+        "boot-file-name": "efi/bootx64.efi",
+        "option-data": [ { "name": "routers", "data": net_cards[net]['ip'] } ]
     }
     if networks[net] == 1:
         subnet["pools"] = [ { "pool": cranixconfig.CRANIX_ANON_DHCP_RANGE.replace(" "," - ") } ]
@@ -149,6 +174,7 @@ with open("/etc/kea/kea-dhcp4.conf","w") as cf:
 os.system("echo 'DROP DATABASE IF EXISTS kea_dhcp4'| mysql")
 os.system("echo 'CREATE DATABASE kea_dhcp4'| mysql")
 os.system(f"echo 'GRANT ALL ON kea_dhcp4.* TO \"keauser\"@\"localhost\" IDENTIFIED BY \"{password}\"'| mysql")
+os.system("/usr/bin/systemctl enable kea-dhcp4.service")
 os.system("/usr/bin/systemctl restart kea-dhcp4.service")
 time.sleep(5)
 rooms = {}
