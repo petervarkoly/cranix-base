@@ -237,13 +237,15 @@ def read_data():
     else:
         print("You have to define a room")
         sys.exit(-1)
-    for line in os.popen("/usr/sbin/iptables  -nL -t nat").readlines():
+    for line in os.popen("/usr/sbin/iptables  -nL INPUT").readlines():
         tmp = line.split()
         if len(tmp) > 0 and tmp[0] == "DROP" and tmp[3] in rooms:
             if tmp[4] == proxy:
                 rooms[tmp[3]]['proxy'] = False
             if tmp[4] == portal:
                 rooms[tmp[3]]['portal'] = False
+    for line in os.popen("/usr/sbin/iptables  -nL -t nat").readlines():
+        tmp = line.split()
         if len(tmp) > 0 and ((tmp[0] == "SNAT" or tmp[0] == "MASQUERADE") and tmp[3] in rooms):
             rooms[tmp[3]]['direct'] = True
     log_debug(rooms)
