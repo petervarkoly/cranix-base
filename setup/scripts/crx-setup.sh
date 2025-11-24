@@ -485,17 +485,17 @@ unset _bred _sgr0
 ' > /root/.profile
 
     ########################################################################
-    log "Start and setup mysql"
+    log "Start and setup mariadb"
     cp /etc/my.cnf.in /etc/my.cnf
-    /usr/bin/systemctl start  mysql
-    /usr/bin/systemctl enable mysql
+    /usr/bin/systemctl start  mariadb
+    /usr/bin/systemctl enable mariadb
     ########################################################################
-    log "Make mysql secure"
+    log "Make mariadb secure"
     cd /root
     password=`mktemp XXXXXXXXXX`
-    echo "CREATE DATABASE CRX" | mysql
-    echo "grant all on CRX.* to 'cranix'@'localhost'  identified by '$password'" | mysql
-    mysqladmin -u root password $password
+    echo "CREATE DATABASE CRX" | mariadb
+    echo "grant all on CRX.* to 'cranix'@'localhost'  identified by '$password'" | mariadb
+    mariadb-admin -u root password $password
 echo "[client]
 host=localhost
 user=root
@@ -504,8 +504,9 @@ chmod 600 /root/.my.cnf
 
     sed -i s/MYSQLPWD/$password/ /opt/cranix-java/conf/cranix-api.properties
     sed -i s/CRANIX_NETBIOSNAME/${CRANIX_NETBIOSNAME}/ /opt/cranix-java/conf/cranix-api.properties
-    /usr/bin/systemctl restart  mysql
+    /usr/bin/systemctl restart  mariadb
     sleep 5
+    java -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp /opt/cranix-java/lib/cranix-16.0.jar  de.cranix.api.CranixApplication setupDB
     SERVER_NETWORK=$( echo $CRANIX_SERVER_NET | gawk -F '/' '{ print $1 }' )
     SERVER_NETMASK=$( echo $CRANIX_SERVER_NET | gawk -F '/' '{ print $2 }' )
     ANON_NETWORK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $1 }' )
@@ -517,7 +518,7 @@ chmod 600 /root/.my.cnf
         /usr/bin/systemctl stop cranix-api
 	sleep 5
     fi
-    mysql < /opt/cranix-java/data/crx-objects.sql
+    mariadb < /opt/cranix-java/data/crx-objects.sql
     for i in /opt/cranix-java/data/*-inserts.sql
     do
 	sed -i "s/#SERVER_NETWORK#/${SERVER_NETWORK}/g"		$i
@@ -536,16 +537,16 @@ chmod 600 /root/.my.cnf
     done
     case $CRANIX_TYPE in
         cephalix)
-            mysql -f CRX < /opt/cranix-java/data/school-inserts.sql
-            mysql -f CRX < /opt/cranix-java/data/cephalix-inserts.sql
+            mariadb -f CRX < /opt/cranix-java/data/school-inserts.sql
+            mariadb -f CRX < /opt/cranix-java/data/cephalix-inserts.sql
             /usr/bin/systemctl start cephalix-api
 	;;
         business)
-            mysql -f CRX < /opt/cranix-java/data/business-inserts.sql
+            mariadb -f CRX < /opt/cranix-java/data/business-inserts.sql
             /usr/bin/systemctl start cranix-api
 	;;
 	*)
-            mysql -f CRX < /opt/cranix-java/data/school-inserts.sql
+            mariadb -f CRX < /opt/cranix-java/data/school-inserts.sql
             /usr/bin/systemctl start cranix-api
     esac
     sleep 3
