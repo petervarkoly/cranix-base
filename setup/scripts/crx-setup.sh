@@ -494,7 +494,7 @@ unset _bred _sgr0
     cd /root
     password=`mktemp XXXXXXXXXX`
     echo "CREATE DATABASE CRX" | mysql
-    echo "grant all on CRX.* to 'cranix'@'localhost'  identified by '$password'" | mysql
+    echo "GRANT ALL on CRX.* to 'cranix'@'localhost'  identified by '$password'" | mysql
     mysqladmin -u root password $password
 echo "[client]
 host=localhost
