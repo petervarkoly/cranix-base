@@ -494,7 +494,7 @@ unset _bred _sgr0
     cd /root
     password=`mktemp XXXXXXXXXX`
     echo "CREATE DATABASE CRX" | mariadb
-    echo "grant all on CRX.* to 'cranix'@'localhost'  identified by '$password'" | mariadb
+    echo "GRANT ALL ON CRX.* TO 'cranix'@'localhost'  IDENTIFIED BY '$password'" | mariadb
     mariadb-admin -u root password $password
 echo "[client]
 host=localhost
@@ -511,14 +511,6 @@ chmod 600 /root/.my.cnf
     SERVER_NETMASK=$( echo $CRANIX_SERVER_NET | gawk -F '/' '{ print $2 }' )
     ANON_NETWORK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $1 }' )
     ANON_NETMASK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $2 }' )
-    if [ "$CRANIX_TYPE" = "cephalix"  ]; then
-        /usr/bin/systemctl stop cephalix-api
-	sleep 5
-    else
-        /usr/bin/systemctl stop cranix-api
-	sleep 5
-    fi
-    mariadb < /opt/cranix-java/data/crx-objects.sql
     for i in /opt/cranix-java/data/*-inserts.sql
     do
 	sed -i "s/#SERVER_NETWORK#/${SERVER_NETWORK}/g"		$i
