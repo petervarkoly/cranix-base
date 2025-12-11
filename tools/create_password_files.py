@@ -3,9 +3,10 @@
 # Copyright (C) Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 #
 
-import sys
 import csv
 import os
+import sys
+from html import escape
 
 import_dir= sys.argv[1] + "/"
 role      = sys.argv[2]
@@ -29,7 +30,7 @@ with open(user_list) as csvfile:
         group=""
         for field in reader.fieldnames:
             to_replace = '#'+field+'#'
-            template = template.replace(to_replace, row[field])
+            template = template.replace(to_replace, escape(row[field]))
             if field == "uid":
                 uid=row[field]
             if  ( role == 'students' ) and ( field == "classes" ):
