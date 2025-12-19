@@ -1,10 +1,10 @@
 #!/usr/bin/python3.11
 
+import ipaddress
+import psutil
 import tkinter as tk
 from tkinter import ttk
-import psutil
-
-import ipaddress
+from configobj import ConfigObj
 
 def ist_valide_ipv4(ip) -> bool:
     try:
@@ -154,7 +154,7 @@ def check_values():
         showerror("Domain Name must not be empty")
         return
     inst_type = entry_type.get()
-    retg_code = entry_regcode.get()
+    reg_code = entry_regcode.get()
     pw1 = entry_pw.get()
     pw2 = entry_pw2.get()
     if pw1 == "" or pw1 != pw2:
@@ -182,7 +182,24 @@ def check_values():
     if ext_ip != "dhcp" and not ist_valide_ipv4(ext_gateway):
         showerror("External gateway IP is not valide.")
         return
-    
+    #Write values
+    with open("/root/passwd") as f:
+        f.write(pw1)
+    #TODO
+    with open("/root/cpasswd") as f:
+        f.write(pw1)
+    cranix_conf = ConfigObj('/etc/sysconfig/cranix',list_values=False,encoding='utf-8')
+    cranix_conf['CRANIX_NAME']=name
+    cranix_conf['CRANIX_DOMAIN']=domain_name
+    cranix_conf['CRANIX_TYPE']=inst_type
+    cranix_conf['CRANIX_REG_CODE']=reg_code
+    cranix_conf['CRANIX_INTERNAL_DEVICE']=device
+    cranix_conf['CRANIX_NETWORK']=network
+    cranix_conf['CRANIX_NETMASK']=netmask
+    cranix_conf['CRANIX_EXT_DEVICE']=ext_device
+    cranix_conf['CRANIX_EXT_IP']=ext_ip
+    cranix_conf['CRANIX_EXT_NETMASK']=ext_netmask
+    cranix_conf['CRANIX_EXT_GATEWAY']=ext_gateway
 
 width=35
 language="de"
