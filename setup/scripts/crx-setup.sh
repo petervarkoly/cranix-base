@@ -50,7 +50,6 @@ function usage (){
 	echo "          -h,   --help              Display the help."
 	echo "                --all               Setup all services and create the initial groups and user accounts."
 	echo "                --samba             Setup the AD-DC samba server."
-	echo "                --printserver       Setup the printserver."
 	echo "                --fileserver        Setup the fileserver."
 	echo "                --dhcp              Setup the DHCP server"
 	echo "                --mail              Setup the mail server"
@@ -73,7 +72,7 @@ function log() {
     fi
 }
 
-function InitGlobalVariable (){
+function PreSetup (){
 
     ########################################################################
     # Avoid running migration scripts:
@@ -102,7 +101,23 @@ function InitGlobalVariable (){
     sed -i s/^CRANIX_DOMAIN=.*/CRANIX_DOMAIN=\"$CRANIX_DOMAIN\"/ $sysconfig
     REALM=${CRANIX_DOMAIN^^}
 
-    log "End InitGlobalVariable"
+    echo "Setup internal network"
+    if [ ${CRANIX_SERVER} != ${CRANIX_NET_GATEWAY} ]; then
+	    INTERNAL_GATEWAY="ipv4.gateway ${CRANIX_NET_GATEWAY}"
+    fi
+    nmcli connection add type ethernet con-name "cranix-intern" ifname ${CRANIX_INTERNAL_DEVICE} ipv4.method manual \
+	    ipv4.addresses ${CRANIX_SERVER}/${CRANIX_NETMASK},${CRANIX_FILESERVER}/${CRANIX_NETMASK},${CRANIX_PRINTSERVER}/${CRANIX_NETMASK},${CRANIX_MAILSERVER}/${CRANIX_NETMASK},${CRANIX_PROXY}/${CRANIX_NETMASK} \
+	    ${INTERNAL_GATEWAY} ipv4.dns "127.0.0.1,8.8.8.8,8.8.4.4"
+    nmcli connection up "cranix-intern"
+    if [ "${CRANIX_SERVER_EXT_DEVICE}" ]; then
+	    if [ ${CRANIX_SERVER_EXT_IP} == "auto" ]; then
+    		nmcli connection add type ethernet con-name "cranix-external" ifname ${CRANIX_SERVER_EXT_DEVICE} ipv4.method auto
+	    else
+    		nmcli connection add type ethernet con-name "cranix-external" ifname ${CRANIX_SERVER_EXT_DEVICE} ipv4.method manual \
+			ipv4.addresses ${CRANIX_SERVER_EXT_IP}/${CRANIX_SERVER_EXT_NETMASK} ipv4.gateway ${CRANIX_SERVER_EXT_GW}
+	    fi
+    fi
+    log "End PreSetup"
 }
 
 function SetupSamba (){
@@ -122,7 +137,6 @@ function SetupSamba (){
     log " - Clean up befor samba config"
     mkdir -p /etc/samba-backup-$logdate
     mv /etc/krb5.conf /etc/krb5.conf.$logdate
-    cp -r /etc/samba/ /etc/samba-backup-$logdate
     rm -r /etc/samba/*
 
     ########################################################################
@@ -307,30 +321,6 @@ function SetupFileserver () {
     systemctl enable samba-fileserver
     systemctl start  samba-fileserver
     log "End Setup Fileserver"
-}
-
-function SetupDHCP (){
-    log "Start SetupDHCP"
-    sed    "s/#CRANIX_SERVER#/${CRANIX_SERVER}/g"                   /usr/share/cranix/setup/templates/dhcpd.conf.ini > /usr/share/cranix/templates/dhcpd.conf
-    sed -i "s/#CRANIX_DOMAIN#/${CRANIX_DOMAIN}/g"                   /usr/share/cranix/templates/dhcpd.conf
-    sed -i "s/#CRANIX_ANON_DHCP_RANGE#/${CRANIX_ANON_DHCP_RANGE}/g" /usr/share/cranix/templates/dhcpd.conf
-    sed -i "s/#CRANIX_NETWORK#/${CRANIX_NETWORK}/g"                 /usr/share/cranix/templates/dhcpd.conf
-    sed -i "s/#CRANIX_NETMASK#/${CRANIX_NETMASK_STRING}/g"          /usr/share/cranix/templates/dhcpd.conf
-    cp /usr/share/cranix/templates/dhcpd.conf /etc/dhcpd.conf
-    if [ $CRANIX_USE_DHCP = "yes" ]; then
-        . /etc/sysconfig/dhcpd
-        if [ -z "$DHCPD_INTERFACE" ]; then
-            sed -i 's/^DHCPD_INTERFACE=.*/DHCPD_INTERFACE="ANY"/'   /etc/sysconfig/dhcpd
-        fi
-        /usr/bin/systemctl enable dhcpd
-        /usr/bin/systemctl start  dhcpd
-    fi
-    log "End SetupDHCP"
-}
-
-function SetupMail (){
-    log "Start SetupMail"
-    log "End SetupMail"
 }
 
 function SetupInternetFilter (){
@@ -555,6 +545,17 @@ chmod 600 /root/.my.cnf
     /opt/cranix-java/data/updates/022-add-subjects.sh
 }
 
+function SetupDHCP (){
+    log "Start SetupDHCP"
+    /usr/share/cranix/setup/scripts/setup-kea.py
+    log "End SetupDHCP"
+}
+
+function SetupMail (){
+    log "Start SetupMail"
+    log "End SetupMail"
+}
+
 function PostSetup (){
     ########################################################################
     log "Adapt atd"
@@ -718,7 +719,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-InitGlobalVariable
+PreSetup
 if [ "$all" = "yes" ] || [ "$samba" = "yes" ]; then
     SetupSamba
 fi
@@ -731,9 +732,6 @@ fi
 if [ "$all" = "yes" ] || [ "$samba" = "yes" ] || [ "$fileserver" = "yes" ]; then
     SetupFileserver
 fi
-if [ "$all" = "yes" ] || [ "$dhcp" = "yes" ]; then
-    SetupDHCP
-fi
 if [ "$all" = "yes" ] || [ "$mail" = "yes" ]; then
     SetupMail
 fi
@@ -742,6 +740,9 @@ if [ "$all" = "yes" ] || [ "$api" = "yes" ]; then
 fi
 if [ "$all" = "yes" ] || [ "$filter" = "yes" ]; then
     SetupInternetFilter
+fi
+if [ "$all" = "yes" ] || [ "$dhcp" = "yes" ]; then
+    SetupDHCP
 fi
 if [ "$all" = "yes" ] || [ "$postsetup" = "yes" ]; then
     PostSetup

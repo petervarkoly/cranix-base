@@ -100,6 +100,10 @@ CRANIX_BACKUP_WITH_HARDLINK="no"
 ########################################################################
 
 ## Type:	string readonly
+# The internal network device of the admin server of the CRANIX.
+CRANIX_INTERNAL_DEVICE=""
+
+## Type:	string readonly
 # Network Address of the internal network.
 CRANIX_NETWORK=""
 
@@ -180,6 +184,10 @@ CRANIX_PROXY=""
 ## Type:	string readonly
 # IP-address of the backup server of the CRANIX.
 CRANIX_BACKUP_SERVER=""
+
+## Type:	string readonly
+# The default gateway of the server.
+CRANIX_SERVER_EXT_DEVICE=""
 
 ## Type:	string readonly
 # The default gateway of the server.
