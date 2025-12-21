@@ -70,6 +70,10 @@ if [ -z "$uid" ]; then
    echo "ERROR You have to define an uid."
    exit 4;
 fi
+if [[ "${CRANIX_DB_ONLY_ROLES,,}" =~ [[:<:]]${role,,}[[:>:]] ]]; then
+	#This user does not exist in system
+	exit 0
+fi
 
 HOMEDIR=$( /usr/sbin/crx_get_home.sh $uid )
 UIDNUMBER=$(  /usr/sbin/crx_get_uidNumber.sh $uid )

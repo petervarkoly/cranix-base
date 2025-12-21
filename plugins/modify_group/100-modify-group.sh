@@ -50,6 +50,10 @@ do
   esac
 done
 
+if [[ "${CRANIX_DB_ONLY_ROLES,,}" =~ [[:<:]]${name,,}[[:>:]] ]]; then
+	#This group does not exist in system
+	exit 0
+fi
 nameLo="${name,,}"
 name="${name^^}"
 

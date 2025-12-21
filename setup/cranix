@@ -266,6 +266,12 @@ CRANIX_TYPE="real"
 # The name of the institute.
 CRANIX_NAME="CRANIX"
 
+## Type:        string
+## Default:
+# Users in this role must not be created in system. These exists only in DB
+# Usefull for users like parents.
+CRANIX_DB_ONLY_ROLES=""
+
 ## Type:	yesno
 ## Default:	no
 # Teachers have read rights in the home directories of  the students.

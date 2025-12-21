@@ -23,6 +23,7 @@ fi
 
 surname=''
 givenname=''
+role=''
 uid=''
 password=''
 rpassword='no'
@@ -39,6 +40,7 @@ abort() {
 	echo "password: $password"   >> /var/adm/cranix/opentasks/$TASK
 	echo "mpassword: $mpassword" >> /var/adm/cranix/opentasks/$TASK
 	echo "surname: $surname"     >> /var/adm/cranix/opentasks/$TASK
+	echo "role: $role" >> /var/adm/cranix/opentasks/$TASK
 	echo "givenname: $givenname" >> /var/adm/cranix/opentasks/$TASK
 	echo "fsquota: $fsquota"     >> /var/adm/cranix/opentasks/$TASK
         echo "msquota: $msquota"     >> /var/adm/cranix/opentasks/$TASK
@@ -60,6 +62,9 @@ do
     givenname)
       givenname="${c}"
     ;;
+    role)
+      role="${c}"
+    ;;
     uid)
       uid="${c}"
     ;;
@@ -79,6 +84,10 @@ do
   esac
 done
 
+if [[ "${CRANIX_DB_ONLY_ROLES,,}" =~ [[:<:]]${role,,}[[:>:]] ]]; then
+	#This user does not exist in system
+	exit 0
+fi
 #Set fsquota
 /usr/sbin/crx_set_quota.sh $uid $fsquota
 

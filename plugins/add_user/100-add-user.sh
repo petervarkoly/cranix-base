@@ -82,6 +82,14 @@ do
   esac
 done
 
+variable="Das ist eine Berufsschule in Nürnberg"
+suchbegriff="Berufsschule"
+
+# [[:<:]] und [[:>:]] sind die sichersten Wortgrenzen-Marker in der Bash-Regex
+if [[ "${CRANIX_DB_ONLY_ROLES,,}" =~ [[:<:]]${role,,}[[:>:]] ]]; then
+	#This user must not be created in system
+	exit 0
+fi
 skel="/etc/skel"
 
 if [ -z "${CRANIX_FILESERVER_NETBIOSNAME}" ]; then
