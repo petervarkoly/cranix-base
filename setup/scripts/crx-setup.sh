@@ -112,11 +112,13 @@ function PreSetup (){
     if [ "${CRANIX_SERVER_EXT_DEVICE}" ]; then
 	    if [ ${CRANIX_SERVER_EXT_IP} == "auto" ]; then
     		nmcli connection add type ethernet con-name "cranix-external" ifname ${CRANIX_SERVER_EXT_DEVICE} ipv4.method auto
+		nmcli connection modify "cranix-external" ipv4.ignore-auto-dns yes
 	    else
     		nmcli connection add type ethernet con-name "cranix-external" ifname ${CRANIX_SERVER_EXT_DEVICE} ipv4.method manual \
 			ipv4.addresses ${CRANIX_SERVER_EXT_IP}/${CRANIX_SERVER_EXT_NETMASK} ipv4.gateway ${CRANIX_SERVER_EXT_GW}
 	    fi
     fi
+    nmcli connection up "cranix-extern"
     log "End PreSetup"
 }
 
