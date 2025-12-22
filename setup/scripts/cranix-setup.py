@@ -185,6 +185,13 @@ def check_values() -> bool:
         return False
     inst_type = entry_type.get()
     reg_code = entry_regcode.get()
+    if reg_code == "":
+        showerror("You have to provide a Registration Code.")
+        return False
+    is_valide = os.popen(f"curl --insecure -X GET https://repo.cephalix.eu/api/customers/regcodes/{reg_code}").read()
+    if is_valide == "0":
+        showerror("Regcode is not valide")
+        return False
     pw1 = entry_pw.get()
     pw2 = entry_pw2.get()
     if pw1 == "" or pw1 != pw2:
