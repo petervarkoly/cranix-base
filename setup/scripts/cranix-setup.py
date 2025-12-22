@@ -1,6 +1,7 @@
 #!/usr/bin/python3.11
 
 import ipaddress
+import os
 import psutil
 import tkinter as tk
 from tkinter import ttk
@@ -38,6 +39,18 @@ def list_physical_interfaces():
         if mac != "":
             interfaces.append(f"{interface} {mac} {ip}")
     return interfaces
+
+def showmessage(text: str):
+    popup = tk.Toplevel(root)
+    popup.title(_("Message"))
+    popup.geometry("250x80")
+    popup.grab_set()
+    def confirm():
+        popup.destroy()
+    w = tk.Label(popup, justify="center", text=_(text))
+    w.pack()
+    b = tk.Button(popup, text="OK", command=confirm)
+    b.pack()
 
 def showerror(text: str, description: str = ""):
     popup = tk.Toplevel(root)
@@ -144,49 +157,66 @@ def create_field(label_text, row, column, is_password=False):
     ent.grid(row=row*2 + 1, column=column, sticky="ew", padx=5)
     return ent
 
-def check_values():
+def setup_server():
+    if not check_values():
+        return
+    btn_save.config(state="disabled")
+    btn_setup.config(state="disabled")
+    btn_abort.config(state="disabled")
+    showmessage("Start registration")
+    result = os.system("/usr/share/cranix/tools/register.sh")
+    print(result)
+    showmessage("Setup AD Server")
+    result = os.system("/usr/share/cranix/setup/scripts/crx-setup.sh --passwdf=/root/passwd --samba")
+    print(result)
+    showmessage("Setup Inital Accounts")
+    result = os.system("/usr/share/cranix/setup/scripts/crx-setup.sh --passwdf=/root/passwd --accounts --dhcp --postsetup --filter --api")
+    print(result)
+    exit()
+
+def check_values() -> bool:
     name = entry_name.get()
     if name == "":
         showerror("Institute Name must not be empty")
-        return
+        return False
     domain_name = entry_domain.get()
     if domain_name == "":
         showerror("Domain Name must not be empty")
-        return
+        return False
     inst_type = entry_type.get()
     reg_code = entry_regcode.get()
     pw1 = entry_pw.get()
     pw2 = entry_pw2.get()
     if pw1 == "" or pw1 != pw2:
         showerror("Password is bad")
-        return
+        return False
     network = entry_network.get()
     if not ist_valide_ipv4(network):
         showerror("Network is not valide")
-        return
+        return False
     netmask = entry_netmask.get()
     device = entry_device.get()
     if device == "":
         showerror("You have to select a internal network device!")
-        return
+        return False
     ext_ip = entry_ext_ip.get()
     if ext_ip != "dhcp" and not ist_valide_ipv4(ext_ip):
         showerror("External IP Address is not valide.", "You have to enter 'dhcp' or a valide IP address.")
-        return
+        return False
     ext_netmask = entry_ext_netmask.get()
     ext_device = entry_ext_device.get()
     if ext_device == "":
         showerror("You have to select a external network device!")
-        return
+        return False
     ext_gateway = entry_ext_gateway.get()
     if ext_ip != "dhcp" and not ist_valide_ipv4(ext_gateway):
         showerror("External gateway IP is not valide.")
-        return
+        return False
     #Write values
-    with open("/root/passwd") as f:
+    with open("/root/passwd","w") as f:
         f.write(pw1)
     #TODO
-    with open("/root/cpasswd") as f:
+    with open("/root/cpasswd","w") as f:
         f.write(pw1)
     cranix_conf = ConfigObj('/etc/sysconfig/cranix',list_values=False,encoding='utf-8')
     cranix_conf['CRANIX_NAME']=name
@@ -200,6 +230,8 @@ def check_values():
     cranix_conf['CRANIX_EXT_IP']=ext_ip
     cranix_conf['CRANIX_EXT_NETMASK']=ext_netmask
     cranix_conf['CRANIX_EXT_GATEWAY']=ext_gateway
+    cranix_conf.write()
+    return True
 
 width=35
 language="de"
@@ -249,7 +281,7 @@ if __name__ == '__main__':
     
     btn_netmask = tk.Button(root, text=_("Netmask"), command=open_netmask_selection).grid(row=0, column=2, sticky="w", padx=(0,5), pady=(10,0))
     entry_netmask = tk.Entry(root, width=10)
-    entry_netmask.grid(row=1, column=2)
+    entry_netmask.grid(row=1, column=2, sticky="w")
     entry_netmask.insert(0,"16")
     entry_netmask.config(state="readonly")
     
@@ -262,7 +294,7 @@ if __name__ == '__main__':
     
     btn_ext_netmask = tk.Button(root, text=_("Netmask"), command=open_ext_netmask_selection).grid(row=4, column=2, sticky="w", padx=(0,5), pady=(10,0))
     entry_ext_netmask = tk.Entry(root, width=10)
-    entry_ext_netmask.grid(row=5, column=2)
+    entry_ext_netmask.grid(row=5, column=2, sticky="w")
     entry_ext_netmask.insert(0,"24")
     entry_ext_netmask.config(state="readonly")
     
@@ -273,6 +305,11 @@ if __name__ == '__main__':
     entry_ext_gateway = create_field("External Gateway:", 4, 1)
     entry_ext_gateway.insert(0,"192.168.178.1")
     # Last button    
-    btn_save = tk.Button(root, text=_("Save"), command=check_values).grid(row=12, column=0, columnspan=3, ipadx=100, pady=15)
+    btn_save  = tk.Button(root, text=_("Save"), command=check_values)
+    btn_save.grid(row=12, column=0, pady=15)
+    btn_setup = tk.Button(root, text=_("Setup"), command=setup_server)
+    btn_setup.grid(row=12, column=1, pady=15)
+    btn_abort = tk.Button(root, text=_("Abort"), command=exit)
+    btn_abort.grid(row=12, column=2, pady=15)
     
     root.mainloop()
