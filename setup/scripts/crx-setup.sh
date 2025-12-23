@@ -84,6 +84,7 @@ function PreSetup (){
     ########################################################################
     log " - Read sysconfig file"
     . $sysconfig
+    . /etc/os-release
 
     log "   passwd = $passwd"
 
@@ -328,6 +329,7 @@ function SetupFileserver () {
 function SetupInternetFilter (){
     if [ ${CRANIX_INTERNET_FILTER} = "proxy" ]; then
         log "Start SetupProxy"
+	zypper -n install cranix-proxy
         sed "s/#DOMAIN#/${CRANIX_DOMAIN}/g" /srv/www/admin/proxy.pac.in > /srv/www/admin/proxy.pac
         ln  /srv/www/admin/proxy.pac /srv/www/admin/wpad.dat
         cp /etc/squid/squid.conf.in      /etc/squid/squid.conf
@@ -336,9 +338,7 @@ function SetupInternetFilter (){
         log "End SetupProxy"
     else
 	log "Start SetupUnbound"
-	if [ ! -e /usr/share/cranix/tools/unbound/setup.sh ]; then
-		zypper -n install cranix-unbound
-	fi
+	zypper -n install cranix-unbound
 	/usr/share/cranix/tools/unbound/setup.sh
 	log "End SetupUnbound"
     fi
@@ -457,6 +457,16 @@ function SetupInitialAccounts (){
 
 function SetupApi (){
     log "Start SetupApi"
+    log "Install the right Api package"
+    if [ ${CRANIX_TYPE,,} == "cephalix" ]; then
+	    zypper -n install cephalix-java cephalix-base
+	    JAVA_LIB="/opt/cranix-java/lib/cranix-${VERSION_ID}.jar"
+	    JAVA_APPLICATION="de.cranix.api.CephalixxApplication"
+    else
+	    zypper -n install cranix-java
+	    JAVA_LIB="/opt/cranix-java/lib/cranix-${VERSION_ID}.jar"
+	    JAVA_APPLICATION="de.cranix.api.CranixApplication"
+    fi
 
     ########################################################################
     log "Setup ssh key"
@@ -498,7 +508,7 @@ chmod 600 /root/.my.cnf
     sed -i s/CRANIX_NETBIOSNAME/${CRANIX_NETBIOSNAME}/ /opt/cranix-java/conf/cranix-api.properties
     /usr/bin/systemctl restart  mariadb
     sleep 5
-    java -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp /opt/cranix-java/lib/cranix-16.0.jar  de.cranix.api.CranixApplication setupDB
+    java -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp ${JAVA_LIB} ${JAVA_APPLICATION} setupDB
     SERVER_NETWORK=$( echo $CRANIX_SERVER_NET | gawk -F '/' '{ print $1 }' )
     SERVER_NETMASK=$( echo $CRANIX_SERVER_NET | gawk -F '/' '{ print $2 }' )
     ANON_NETWORK=$( echo $CRANIX_ANON_DHCP_NET | gawk -F '/' '{ print $1 }' )
@@ -519,7 +529,7 @@ chmod 600 /root/.my.cnf
 	sed -i "s/#CRANIX_NETWORK#/${CRANIX_NETWORK}/g"		$i
 	sed -i "s/#CRANIX_NETMASK#/${CRANIX_NETMASK}/g"		$i
     done
-    case $CRANIX_TYPE in
+    case ${CRANIX_TYPE,,} in
         cephalix)
             mariadb -f CRX < /opt/cranix-java/data/school-inserts.sql
             mariadb -f CRX < /opt/cranix-java/data/cephalix-inserts.sql
