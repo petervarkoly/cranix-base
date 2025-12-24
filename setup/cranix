@@ -163,7 +163,7 @@ CRANIX_FILESERVER=""
 
 ## Type:        string readonly
 # Name of the file server of the CRANIX.
-CRANIX_FILESERVER_NETBIOSNAME=""
+CRANIX_FILESERVER_NETBIOSNAME="fileserver"
 
 ## Type:        string readonly
 # IP-address of the print server of the CRANIX.
@@ -171,7 +171,7 @@ CRANIX_PRINTSERVER=""
 
 ## Type:        string readonly
 # Name of the print server of the CRANIX.
-CRANIX_PRINTSERVER_NETBIOSNAME=""
+CRANIX_PRINTSERVER_NETBIOSNAME="printserver"
 
 ## Type:	string readonly
 # IP-address of the mail server and groupware of the CRANIX.

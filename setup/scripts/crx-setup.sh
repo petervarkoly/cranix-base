@@ -559,6 +559,7 @@ chmod 600 /root/.my.cnf
 
 function SetupDHCP (){
     log "Start SetupDHCP"
+    zypper -n install kea kea-hooks
     /usr/share/cranix/setup/scripts/setup-kea.py
     log "End SetupDHCP"
 }

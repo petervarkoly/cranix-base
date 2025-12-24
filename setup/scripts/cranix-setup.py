@@ -1,11 +1,11 @@
-#!/usr/bin/python3.11
+#!/usr/bin/python3
 
 import ipaddress
 import os
 import psutil
 import tkinter as tk
 from tkinter import ttk
-from configobj import ConfigObj
+from bashconfigparser import BashConfigParser
 
 def ist_valide_ipv4(ip) -> bool:
     try:
@@ -164,13 +164,13 @@ def setup_server():
     btn_setup.config(state="disabled")
     btn_abort.config(state="disabled")
     showmessage("Start registration")
-    result = os.system("xterm -e /usr/share/cranix/tools/register.sh")
+    result = os.system("xterm -e /usr/share/cranix/tools/register.sh 2>&1 | tee -a /var/log/cranix-setup.log")
     print(result)
     showmessage("Setup AD Server")
-    result = os.system("xterm -e /usr/share/cranix/setup/scripts/crx-setup.sh --passwdf=/root/passwd --cephalixpwf=/root/cpasswd --samba")
+    result = os.system("xterm -e /usr/share/cranix/setup/scripts/crx-setup.sh --passwdf=/root/passwd --cephalixpwf=/root/cpasswd --samba 2>&1 | tee -a /var/log/cranix-setup.log")
     print(result)
     showmessage("Setup Inital Accounts")
-    result = os.system("xterm -e /usr/share/cranix/setup/scripts/crx-setup.sh --passwdf=/root/passwd --cephalixpwf=/root/cpasswd --accounts --dhcp --postsetup --filter --api")
+    result = os.system("xterm -e /usr/share/cranix/setup/scripts/crx-setup.sh --passwdf=/root/passwd --cephalixpwf=/root/cpasswd --accounts --dhcp --postsetup --filter --api 2>&1 | tee -a /var/log/cranix-setup.log")
     print(result)
     exit()
 
@@ -206,6 +206,7 @@ def check_values() -> bool:
     if device == "":
         showerror("You have to select a internal network device!")
         return False
+    device = device.split()[0]
     ext_ip = entry_ext_ip.get()
     if ext_ip != "dhcp" and not ist_valide_ipv4(ext_ip):
         showerror("External IP Address is not valide.", "You have to enter 'dhcp' or a valide IP address.")
@@ -215,6 +216,7 @@ def check_values() -> bool:
     if ext_device == "":
         showerror("You have to select a external network device!")
         return False
+    ext_device = ext_device.split()[0]
     ext_gateway = entry_ext_gateway.get()
     if ext_ip != "dhcp" and not ist_valide_ipv4(ext_gateway):
         showerror("External gateway IP is not valide.")
@@ -225,19 +227,35 @@ def check_values() -> bool:
     #TODO
     with open("/root/cpasswd","w") as f:
         f.write(pw1)
-    cranix_conf = ConfigObj('/etc/sysconfig/cranix',list_values=False,encoding='utf-8')
-    cranix_conf['CRANIX_NAME']=name
-    cranix_conf['CRANIX_DOMAIN']=domain_name
-    cranix_conf['CRANIX_TYPE']=inst_type
-    cranix_conf['CRANIX_REG_CODE']=reg_code
-    cranix_conf['CRANIX_INTERNAL_DEVICE']=device
-    cranix_conf['CRANIX_NETWORK']=network
-    cranix_conf['CRANIX_NETMASK']=netmask
-    cranix_conf['CRANIX_EXT_DEVICE']=ext_device
-    cranix_conf['CRANIX_EXT_IP']=ext_ip
-    cranix_conf['CRANIX_EXT_NETMASK']=ext_netmask
-    cranix_conf['CRANIX_EXT_GATEWAY']=ext_gateway
-    cranix_conf.write()
+    int_ip = network.split(".")
+    cranix_conf = BashConfigParser()
+    cranix_conf.parse_file('/etc/sysconfig/cranix')
+    cranix_conf.set('CRANIX_NAME', name)
+    cranix_conf.set('CRANIX_DOMAIN', domain_name)
+    cranix_conf.set('CRANIX_WORKGROUP', domain_name.split(".")[0].upper())
+    cranix_conf.set('CRANIX_TYPE', inst_type)
+    cranix_conf.set('CRANIX_REG_CODE', reg_code)
+    cranix_conf.set('CRANIX_INTERNAL_DEVICE', device)
+    cranix_conf.set('CRANIX_NETWORK', network)
+    cranix_conf.set('CRANIX_NETMASK', netmask)
+    cranix_conf.set('CRANIX_SERVER_EXT_DEVICE', ext_device)
+    cranix_conf.set('CRANIX_SERVER_EXT_IP', ext_ip)
+    cranix_conf.set('CRANIX_SERVER_EXT_NETMASK', ext_netmask)
+    cranix_conf.set('CRANIX_SERVER_EXT_GW', ext_gateway)
+    int_ip[3]="2"
+    cranix_conf.set('CRANIX_SERVER', '.'.join(int_ip))
+    cranix_conf.set('CRANIX_NET_GATEWAY', '.'.join(int_ip))
+    int_ip[3]="3"
+    cranix_conf.set('CRANIX_FILESERVER', '.'.join(int_ip))
+    int_ip[3]="4"
+    cranix_conf.set('CRANIX_PRINTSERVER', '.'.join(int_ip))
+    int_ip[3]="5"
+    cranix_conf.set('CRANIX_MAILSERVER', '.'.join(int_ip))
+    int_ip[3]="6"
+    cranix_conf.set('CRANIX_PROXY', '.'.join(int_ip))
+    int_ip[3]="7"
+    cranix_conf.set('CRANIX_BACKUP_SERVER', '.'.join(int_ip))
+    cranix_conf.save()
     return True
 
 width=35
