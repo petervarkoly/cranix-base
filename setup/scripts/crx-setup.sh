@@ -488,7 +488,6 @@ unset _bred _sgr0
 
     ########################################################################
     log "Start and setup mariadb"
-    cp /etc/my.cnf.in /etc/my.cnf
     /usr/bin/systemctl start  mariadb
     /usr/bin/systemctl enable mariadb
     ########################################################################
