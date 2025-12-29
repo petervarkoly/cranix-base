@@ -1,10 +1,10 @@
 #
-# Copyright (C) 2024 Peter Varkoly <pvarkoly@cephalix.eu> Nürnberg, Germany.  All rights reserved.
+# Copyright (C) 2026 Peter Varkoly <pvarkoly@cephalix.eu> Nürnberg, Germany.  All rights reserved.
 #
 DESTDIR         = /
 SHARE           = $(DESTDIR)/usr/share/cranix/
 FILLUPDIR       = /usr/share/fillup-templates/
-PYTHONSITEARCH  = /usr/lib/python3.6/site-packages/
+PYTHONSITEARCH  = /usr/lib/python3.13/site-packages/
 TOPACKAGE       = Makefile addons cups etc plugins python software sbin setup salt tools templates updates README.md
 HERE            = $(shell pwd)
 REPO            = ~/OSC/home:pvarkoly:CRANIX
@@ -16,7 +16,6 @@ install:
 	mkdir -p $(DESTDIR)/usr/sbin/ 
 	mkdir -p $(DESTDIR)/$(FILLUPDIR)
 	mkdir -p $(DESTDIR)/$(PYTHONSITEARCH)
-	mkdir -p $(DESTDIR)/etc/YaST2/
 	mkdir -p $(DESTDIR)/etc/apache2/vhosts.d/{admin,admin-ssl,cranix,cranix-ssl}
 	mkdir -p $(DESTDIR)/usr/lib/systemd/system/
 	mkdir -p $(DESTDIR)/srv/salt/_modules/
@@ -41,7 +40,6 @@ install:
 	rsync -a   python/          $(DESTDIR)/$(PYTHONSITEARCH)/cranix/
 	mv $(SHARE)/setup/gpg-pubkey-*.asc.key $(DESTDIR)/usr/lib/rpm/gnupg/keys/
 	find $(SHARE)/plugins/ $(SHARE)/tools/ -type f -exec chmod 755 {} \;	
-	install -m 644 setup/cranix-firstboot.xml $(DESTDIR)/etc/YaST2/
 
 dist: 
 	xterm -e git log --raw  &
