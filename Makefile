@@ -52,7 +52,6 @@ dist:
 	tar jcpf $(PACKAGE).tar.bz2 -T files;
 	rm files
 	rm -rf $(PACKAGE)
-	read 
 	if [ -d $(REPO)/$(PACKAGE) ] ; then \
 	   cd $(REPO)/$(PACKAGE); osc up; cd $(HERE);\
 	   mv $(PACKAGE).tar.bz2 $(REPO)/$(PACKAGE); \
