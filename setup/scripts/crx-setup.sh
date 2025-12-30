@@ -23,11 +23,11 @@ postsetup="no"
 accounts="no"
 verbose="yes"
 cephalixpw=""
-registerpw=$( grep de.cranix.dao.User.Register.Password= /opt/cranix-java/conf/cranix-api.properties | sed 's/de.cranix.dao.User.Register.Password=//' )
-# New installation or called in an installed system
-if [ "${registerpw}" = "REGISTERPW" ]; then
-    registerpw=`mktemp XXXXXXXXXX`
-    sed -i s/REGISTERPW/$registerpw/ /opt/cranix-java/conf/cranix-api.properties
+if [ -e /root/registerpw ]; then
+	export registerpw=$( cat /root/registerpw )
+else
+	export registerpw=$( mktemp XXXXXXXXXX )
+	echo -n "$registerpw" > /root/registerpw
 fi
 ########################################################################
 # Fixed gids
@@ -467,6 +467,8 @@ function SetupApi (){
 	    JAVA_LIB="/opt/cranix-java/lib/cranix-${VERSION_ID}.jar"
 	    JAVA_APPLICATION="de.cranix.api.CranixApplication"
     fi
+    sed -i s/REGISTERPW/$registerpw/ /opt/cranix-java/conf/cranix-api.properties
+
 
     ########################################################################
     log "Setup ssh key"

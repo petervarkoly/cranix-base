@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.13
 
 import cranixconfig
 import json
@@ -171,9 +171,9 @@ for net in networks:
 
 with open("/etc/kea/kea-dhcp4.conf","w") as cf:
     cf.write(json.dumps(kea_conf, indent=4, sort_keys=True, ensure_ascii=False))
-os.system("echo 'DROP DATABASE IF EXISTS kea_dhcp4'| mysql")
-os.system("echo 'CREATE DATABASE kea_dhcp4'| mysql")
-os.system(f"echo 'GRANT ALL ON kea_dhcp4.* TO \"keauser\"@\"localhost\" IDENTIFIED BY \"{password}\"'| mysql")
+os.system("echo 'DROP DATABASE IF EXISTS kea_dhcp4'| mariadb")
+os.system("echo 'CREATE DATABASE kea_dhcp4'| mariadb")
+os.system(f"echo 'GRANT ALL ON kea_dhcp4.* TO \"keauser\"@\"localhost\" IDENTIFIED BY \"{password}\"'| mariadb")
 os.system("/usr/bin/systemctl enable kea-dhcp4.service")
 os.system("/usr/bin/systemctl restart kea-dhcp4.service")
 time.sleep(5)

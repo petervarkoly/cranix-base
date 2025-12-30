@@ -255,6 +255,17 @@ def check_values() -> bool:
     cranix_conf.set('CRANIX_PROXY', '.'.join(int_ip))
     int_ip[3]="7"
     cranix_conf.set('CRANIX_BACKUP_SERVER', '.'.join(int_ip))
+    int_ip[3]="0"
+    cranix_conf.set('CRANIX_SERVER_NET', "{0}/{1}".format('.'.join(int_ip),"24"))
+    int_ip[2]="1"
+    cranix_conf.set('CRANIX_ANON_DHCP_NET', "{0}/{1}".format('.'.join(int_ip),"24"))
+    int_ip[2]="2"
+    cranix_conf.set('CRANIX_FIRST_ROOM_NET', '.'.join(int_ip))
+    int_ip[2]="1"
+    start_ip = '.'.join(int_ip)
+    int_ip[3]="255"
+    end_ip = '.'.join(int_ip)
+    cranix_conf.set('CRANIX_ANON_DHCP_RANGE', f"{start_ip} {end_ip}")
     cranix_conf.save()
     return True
 
