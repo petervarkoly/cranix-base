@@ -11,7 +11,7 @@ passwd=""
 windomain=""
 
 # input variable
-passwdf=""
+passwdf="/root/passwd"
 all="no"
 samba="no"
 printserver="no"
@@ -22,7 +22,14 @@ api="no"
 postsetup="no"
 accounts="no"
 verbose="yes"
+cephalixpwf="/root/cpasswd"
 cephalixpw=""
+if [ -e $passwdf ]; then
+	export passwd=$( cat $passwdf )
+fi
+if [ -e $cephalixpwf ]; then
+	export cephalixpw=$( cat $cephalixpwf )
+fi
 if [ -e /root/registerpw ]; then
 	export registerpw=$( cat /root/registerpw )
 else

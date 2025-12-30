@@ -23,6 +23,6 @@ echo "ntp_conf:
 systemctl restart chronyd
 systemctl enable chronyd
 sleep 10
-systemctl restart samba
+systemctl restart samba-ad
 crx_api.sh PUT softwares/saveState
 
