@@ -75,9 +75,10 @@ function log() {
 function PreSetup (){
 
     ########################################################################
-    # Avoid running migration scripts:
     mkdir -p /var/adm/cranix/
-    touch /var/adm/cranix/migrated-to-cranix
+
+    log "Register the Server"
+    /usr/share/cranix/tools/register.sh
 
     log "Start InitGlobalVariable"
 
@@ -110,6 +111,8 @@ function PreSetup (){
 	    ipv4.addresses ${CRANIX_SERVER}/${CRANIX_NETMASK},${CRANIX_FILESERVER}/${CRANIX_NETMASK},${CRANIX_PRINTSERVER}/${CRANIX_NETMASK},${CRANIX_MAILSERVER}/${CRANIX_NETMASK},${CRANIX_PROXY}/${CRANIX_NETMASK} \
 	    ${INTERNAL_GATEWAY} ipv4.dns "127.0.0.1,8.8.8.8,8.8.4.4"
     nmcli connection up "cranix-intern"
+
+    echo "Setup external network"
     if [ "${CRANIX_SERVER_EXT_DEVICE}" ]; then
 	    if [ ${CRANIX_SERVER_EXT_IP} == "auto" ]; then
     		nmcli connection add type ethernet con-name "cranix-external" ifname ${CRANIX_SERVER_EXT_DEVICE} ipv4.method auto
@@ -120,21 +123,14 @@ function PreSetup (){
 	    fi
     fi
     nmcli connection up "cranix-extern"
+    nmcli general hostname admin.${CRANIX_DOMAIN}
+
+    ln -fs /usr/etc/services /etc/services
     log "End PreSetup"
 }
 
 function SetupSamba (){
     log "Start SetupSamba"
-
-    ########################################################################
-    log " - Disable AppArmor on smbd, nmbd, winbindd if exists"
-    if [ -f "/etc/apparmor.d/usr.sbin.smbd" ] && [ -f "/etc/apparmor.d/usr.sbin.nmbd" ] && [ -f "/etc/apparmor.d/usr.sbin.winbindd" ]; then
-	log " - Disable AppArmor on smbd, nmbd, winbindd"
-	mv /etc/apparmor.d/usr.sbin.smbd     /etc/apparmor.d/disable/
-	mv /etc/apparmor.d/usr.sbin.nmbd     /etc/apparmor.d/disable/
-	mv /etc/apparmor.d/usr.sbin.winbindd /etc/apparmor.d/disable/
-	/usr/bin/systemctl restart apparmor.service
-    fi
 
     ########################################################################
     log " - Clean up befor samba config"
