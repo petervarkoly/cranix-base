@@ -94,9 +94,4 @@ if [ ! -e /srv/salt/repos.d/CRANIX.repo ]; then
 	ln -s /etc/zypp/repos.d/CRANIX.repo  /srv/salt/repos.d/CRANIX.repo
 fi
 
-zypper ar /usr/share/cranix/setup/openLeap.repos
-for i in /etc/zypp/repos.d/*.repo
-do
-        sed -i s/VERSION_ID/${VERSION_ID}/ $i
-done
 /usr/bin/zypper --gpg-auto-import-keys ref
