@@ -655,6 +655,11 @@ function PostSetup (){
     ########################################################################
     log "Timeserver setup"
     /usr/share/cranix/setup/scripts/setup-chrony.sh
+
+    ########################################################################
+    log "Install some additional packages"
+    zypper -n install cranix-web cranix-clone
+
     log "End PostSetup"
 }
 

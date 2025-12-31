@@ -222,6 +222,7 @@ def check_values() -> bool:
     with open("/root/cpasswd","w") as f:
         f.write(pw1)
     int_ip = network.split(".")
+    int_ip[3]="0"
     cranix_conf = BashConfigParser()
     cranix_conf.parse_file('/etc/sysconfig/cranix')
     cranix_conf.set('CRANIX_NAME', name)
@@ -230,7 +231,7 @@ def check_values() -> bool:
     cranix_conf.set('CRANIX_TYPE', inst_type)
     cranix_conf.set('CRANIX_REG_CODE', reg_code)
     cranix_conf.set('CRANIX_INTERNAL_DEVICE', device)
-    cranix_conf.set('CRANIX_NETWORK', network)
+    cranix_conf.set('CRANIX_NETWORK', '.'.join(int_ip))
     cranix_conf.set('CRANIX_NETMASK', netmask)
     cranix_conf.set('CRANIX_SERVER_EXT_DEVICE', ext_device)
     cranix_conf.set('CRANIX_SERVER_EXT_IP', ext_ip)
@@ -268,7 +269,6 @@ language="de"
 translation={}
 instTypes =  [ "work", "global", "primary", "gymnasium", "secondary", "real", "special", "other", "administration", "business" ]
 netMasks = ["8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"]
-#netMasks = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
 networks = ["free_entry", "172.16.0.0", "172.17.0.0", "172.18.0.0", "172.19.0.0", "172.20.0.0", "172.21.0.0", "172.22.0.0", "172.23.0.0", "172.24.0.0", "172.25.0.0", "172.26.0.0", "172.27.0.0", "172.28.0.0", "172.29.0.0", "172.30.0.0", "172.31.0.0"]
 interfaces = list_physical_interfaces()
 entry_name: tk.Entry
