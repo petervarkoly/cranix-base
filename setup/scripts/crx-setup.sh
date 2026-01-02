@@ -480,17 +480,6 @@ function SetupApi (){
     /usr/bin/ssh-keygen -t rsa -N '' -f .ssh/id_rsa
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     /bin/chmod 600 /root/.ssh/authorized_keys
-    echo 'stricthostkeychecking no' > /root/.ssh/config
-    echo '# Copyright (c) Peter Varkoly <peter@varkoly.de> Nürnberg, Germany.  All rights reserved.
-. /etc/os-release
-FQH=`hostname -f`
-PS1="$FQH:\w # "
-_bred="$(path tput bold 2> /dev/null; path tput setaf 1 2> /dev/null)"
-_sgr0="$(path tput sgr0 2> /dev/null)"
-PS1="${PRETTY_NAME} \[$_bred\]$PS1\[$_sgr0\]"
-unset _bred _sgr0
-' > /root/.profile
-
     ########################################################################
     log "Start and setup mariadb"
     /usr/bin/systemctl start  mariadb
@@ -635,10 +624,23 @@ function PostSetup (){
     ########################################################################
     log "Enable some important services"
     /usr/lib/systemd-presets-branding/branding-preset-states save
+    NAME="CRANIX"
     if [ "$CRANIX_TYPE" = "cephalix"  ]; then
         /usr/bin/systemctl enable  cephalix-api
         /usr/bin/systemctl disable cranix-api
+	NAME="CEPHALIX"
     fi
+    echo 'stricthostkeychecking no' > /root/.ssh/config
+    echo '# Copyright (c) Peter Varkoly <peter@varkoly.de> Nürnberg, Germany.  All rights reserved.
+. /etc/os-release
+FQH=`hostname -f`
+PS1="$FQH:\w # "
+_bred="$(path tput bold 2> /dev/null; path tput setaf 1 2> /dev/null)"
+_sgr0="$(path tput sgr0 2> /dev/null)"
+PS1="${NAME} ${VERSION} \[$_bred\]$PS1\[$_sgr0\]"
+unset _bred _sgr0
+' > /root/.profile
+
 
     ########################################################################
     log "Generate password file templates"
@@ -660,6 +662,8 @@ function PostSetup (){
     ########################################################################
     log "Timeserver setup"
     /usr/share/cranix/setup/scripts/setup-chrony.sh
+
+    rm -f /root/Desktop/CRANIX-Setup.desktop
 
     log "End PostSetup"
 }
