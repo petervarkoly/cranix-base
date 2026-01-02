@@ -618,8 +618,13 @@ function PostSetup (){
 
     ########################################################################
     log "Setup Cups"
+    cp /etc/cups/cupsd.conf /etc/cups/cupsd.conf.orig
     cp /etc/cups/cupsd.conf.in /etc/cups/cupsd.conf
     /usr/share/cranix/tools/sync-cups-to-samba.py
+
+    ########################################################################
+    log "Install some additional packages"
+    zypper -n install cranix-web cranix-clone
 
     ########################################################################
     log "Prepare roots desktop"
@@ -655,10 +660,6 @@ function PostSetup (){
     ########################################################################
     log "Timeserver setup"
     /usr/share/cranix/setup/scripts/setup-chrony.sh
-
-    ########################################################################
-    log "Install some additional packages"
-    zypper -n install cranix-web cranix-clone
 
     log "End PostSetup"
 }

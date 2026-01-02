@@ -1,0 +1,5 @@
+[Desktop Entry]
+Icon=/srv/www/admin/assets/images/logo/cranix_school.svg
+Name=CRANIX-Admin
+Type=Link
+URL[$e]=http://admin
