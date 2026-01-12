@@ -114,18 +114,26 @@ function PreSetup (){
     if [ ${CRANIX_SERVER} != ${CRANIX_NET_GATEWAY} ]; then
 	    INTERNAL_GATEWAY="ipv4.gateway ${CRANIX_NET_GATEWAY}"
     fi
-    nmcli connection add type ethernet con-name "cranix-intern" ifname ${CRANIX_INTERNAL_DEVICE} ipv4.method manual \
+    LINKTYPE="ethernet"
+    if [ ${CRANIX_INTERNAL_DEVICE/dummy/} != ${CRANIX_INTERNAL_DEVICE} ]; then
+	    LINKTYPE="dummy"
+    fi
+    nmcli connection add type $LINKTYPE con-name "cranix-intern" ifname ${CRANIX_INTERNAL_DEVICE} ipv4.method manual \
 	    ipv4.addresses ${CRANIX_SERVER}/${CRANIX_NETMASK},${CRANIX_FILESERVER}/${CRANIX_NETMASK},${CRANIX_PRINTSERVER}/${CRANIX_NETMASK},${CRANIX_MAILSERVER}/${CRANIX_NETMASK},${CRANIX_PROXY}/${CRANIX_NETMASK} \
 	    ${INTERNAL_GATEWAY} ipv4.dns "127.0.0.1,8.8.8.8,8.8.4.4"
     nmcli connection up "cranix-intern"
 
     echo "Setup external network"
+    LINKTYPE="ethernet"
+    if [ ${CRANIX_SERVER_EXT_DEVICE/dummy/} != ${CRANIX_SERVER_EXT_DEVICE} ]; then
+	    LINKTYPE="dummy"
+    fi
     if [ "${CRANIX_SERVER_EXT_DEVICE}" ]; then
 	    if [ ${CRANIX_SERVER_EXT_IP} == "auto" ]; then
-    		nmcli connection add type ethernet con-name "cranix-external" ifname ${CRANIX_SERVER_EXT_DEVICE} ipv4.method auto
+		nmcli connection add type $LINKTYPE con-name "cranix-external" ifname ${CRANIX_SERVER_EXT_DEVICE} ipv4.method auto
 		nmcli connection modify "cranix-external" ipv4.ignore-auto-dns yes
 	    else
-    		nmcli connection add type ethernet con-name "cranix-external" ifname ${CRANIX_SERVER_EXT_DEVICE} ipv4.method manual \
+		nmcli connection add type $LINKTYPE con-name "cranix-external" ifname ${CRANIX_SERVER_EXT_DEVICE} ipv4.method manual \
 			ipv4.addresses ${CRANIX_SERVER_EXT_IP}/${CRANIX_SERVER_EXT_NETMASK} ipv4.gateway ${CRANIX_SERVER_EXT_GW}
 	    fi
     fi
