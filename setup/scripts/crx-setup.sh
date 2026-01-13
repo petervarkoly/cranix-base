@@ -141,6 +141,15 @@ function PreSetup (){
     nmcli general hostname admin.${CRANIX_DOMAIN}
 
     ln -fs /usr/etc/services /etc/services
+    echo "# CRANIX SPECIFIC ENTRIES
+${CRANIX_SERVER} admin.${CRANIX_DOMAIN} admin
+${CRANIX_FILESERVER} fileserver.${CRANIX_DOMAIN} fileserver
+${CRANIX_PRINTSERVER} printserver.${CRANIX_DOMAIN} printserver
+${CRANIX_MAILSERVER} mailserver.${CRANIX_DOMAIN} mailserver
+${CRANIX_PROXY} proxy.${CRANIX_DOMAIN} proxy
+
+${CRANIX_SERVER_EXT_IP} extip
+    " >> /etc/hosts
     log "End PreSetup"
 }
 
@@ -605,6 +614,10 @@ function PostSetup (){
     /usr/bin/systemctl start  apache2
 
     ########################################################################
+    log "Install some additional packages"
+    zypper -n install cranix-web cranix-clone cranix-firewall
+
+    ########################################################################
     log "Setup firewall"
     /usr/bin/systemctl enable cranix-firewall
     if [ $CRANIX_ISGATE = "yes" ]; then
@@ -618,10 +631,6 @@ function PostSetup (){
     cp /etc/cups/cupsd.conf /etc/cups/cupsd.conf.orig
     cp /etc/cups/cupsd.conf.in /etc/cups/cupsd.conf
     /usr/share/cranix/tools/sync-cups-to-samba.py
-
-    ########################################################################
-    log "Install some additional packages"
-    zypper -n install cranix-web cranix-clone
 
     ########################################################################
     log "Prepare roots desktop"
