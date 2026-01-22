@@ -594,11 +594,10 @@ function PostSetup (){
 
     ########################################################################
     log "Setup sssd configuration"
-    mkdir -p /etc/sssd/
     LDAPBASE=$( crx_get_dn.sh ossreader | sed 's/dn: CN=ossreader,CN=Users,//' )
-    sed "s/###LDAPBASE###/$LDAPBASE/" /usr/share/cranix/setup/templates/sssd.conf > /etc/sssd/sssd.conf
-    sed -i "s/###WORKGROUP###/${CRANIX_WORKGROUP}/" /etc/sssd/sssd.conf
-    chmod 600 /etc/sssd/sssd.conf
+    sed "s/###LDAPBASE###/$LDAPBASE/" /usr/share/cranix/setup/templates/sssd.conf > /usr/etc/sssd/conf.d/cranix.conf
+    sed -i "s/###WORKGROUP###/${CRANIX_WORKGROUP}/" /usr/etc/sssd/conf.d/cranix.conf
+    chmod 600 /usr/etc/sssd/conf.d/cranix.conf
 
     ########################################################################
     log "Adapt Apache configuration"
