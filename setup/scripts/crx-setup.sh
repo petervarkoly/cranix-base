@@ -24,6 +24,7 @@ accounts="no"
 verbose="yes"
 cephalixpwf="/root/cpasswd"
 cephalixpw=""
+all="yes"
 if [ -e $passwdf ]; then
 	export passwd=$( cat $passwdf )
 fi
