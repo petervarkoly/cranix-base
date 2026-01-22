@@ -15,5 +15,4 @@ for room in json.load(os.popen('crx_api.sh GET rooms/all')):
         encoding='utf-8',
         check=True             # Löst eine Ausnahme aus, wenn der Befehl fehlschlägt
     )
-    print(ergebnis.stdout)
 
