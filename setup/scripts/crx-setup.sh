@@ -189,7 +189,7 @@ function SetupSamba (){
 
     ########################################################################
     log " - Tell nsswitch to use winbind."
-    cp /usr/share/cranix/setup/templates/nsswitch.conf /etc/nsswitch.conf
+    cp /usr/share/cranix/setup/templates/nsswitch.conf /usr/etc/nsswitch.conf
 
     ########################################################################
     log " - Create linked groups directory "
@@ -595,9 +595,10 @@ function PostSetup (){
     ########################################################################
     log "Setup sssd configuration"
     LDAPBASE=$( crx_get_dn.sh ossreader | sed 's/dn: CN=ossreader,CN=Users,//' )
-    sed "s/###LDAPBASE###/$LDAPBASE/" /usr/share/cranix/setup/templates/sssd.conf > /usr/etc/sssd/conf.d/cranix.conf
-    sed -i "s/###WORKGROUP###/${CRANIX_WORKGROUP}/" /usr/etc/sssd/conf.d/cranix.conf
-    chmod 600 /usr/etc/sssd/conf.d/cranix.conf
+    mkdir -p /etc/sssd/
+    sed "s/###LDAPBASE###/$LDAPBASE/" /usr/share/cranix/setup/templates/sssd.conf > /etc/sssd/sssd.conf
+    sed -i "s/###WORKGROUP###/${CRANIX_WORKGROUP}/" /etc/sssd/sssd.conf
+    chmod 600 /etc/sssd/sssd.conf
 
     ########################################################################
     log "Adapt Apache configuration"
