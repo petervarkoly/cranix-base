@@ -637,8 +637,13 @@ function PostSetup (){
     ########################################################################
     log "Prepare roots desktop"
     mkdir -p /root/Desktop/
+    echo "[Desktop Entry]
+Icon=/srv/www/admin/assets/images/logo/cranix_school.svg
+Name=CRANIX-Admin
+Type=Link
+URL=https://admin.$CRANIX_DOMAIN
+" > /etc/skel/Desktop/CRANIX-Admin.desktop
     cp /etc/skel/Desktop/* /root/Desktop/
-    tar xf /usr/share/cranix/setup/templates/needed-files-for-root.tar -C /root/
 
     ########################################################################
     log "Enable some important services"
