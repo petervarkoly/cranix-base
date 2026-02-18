@@ -5,6 +5,6 @@ do
 	sleep 1
 done
 touch /run/lock/get_next_id
-echo "INSERT INTO CrxNextID Values(NULL,NOW());" | mysql CRX
-echo "SELECT MAX(id) FROM CrxNextID" | mysql CRX | tail -n 1
+echo "INSERT INTO CrxNextID Values(NULL,NOW());" | mariadb CRX
+echo "SELECT MAX(id) FROM CrxNextID" | mariadb CRX | tail -n 1
 rm -f /run/lock/get_next_id

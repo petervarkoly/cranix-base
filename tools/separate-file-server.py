@@ -74,11 +74,11 @@ else:
 os.system('cp {0} {1}'.format(device_file,backup_dir))
 
 #Get and setup new IP-Address
-next_ip = os.popen('echo  "select IP from Devices where name=\'fileserver\'"  | mysql CRX | tail -n1').read().strip()
+next_ip = os.popen('echo  "select IP from Devices where name=\'fileserver\'"  | mariadb CRX | tail -n1').read().strip()
 if not next_ip:
     next_ip_json = json.load(os.popen('/usr/sbin/crx_api.sh GET rooms/1/availableIPAddresses'))
     next_ip      = next_ip_json[0]
-    os.system("echo \"INSERT INTO Devices VALUES(NULL,1,1,NULL,'fileserver','{0}',NULL,'','',0,0,'','','',0);\" | mysql CRX".format(next_ip))
+    os.system("echo \"INSERT INTO Devices VALUES(NULL,1,1,NULL,'fileserver','{0}',NULL,'','',0,0,'','','',0);\" | mariadb CRX".format(next_ip))
     os.system('/usr/bin/systemctl restart cranix-api.service')
 
 print('Activate the new IP-Address')
