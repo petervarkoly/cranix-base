@@ -38,6 +38,7 @@ def list_physical_interfaces():
                 ip = snic.address
         if mac != "":
             interfaces.append(f"{interface} {mac} {ip}")
+    interfaces.append('dummy0')
     return interfaces
 
 def showmessage(text: str):
@@ -71,7 +72,7 @@ def showerror(text: str, description: str = ""):
     b.pack()
         
 def open_selection_popup(options, variable: tk.Entry):
-       # 1. Das Popup-Fenster (Toplevel)
+    # 1. Das Popup-Fenster (Toplevel)
     popup = tk.Toplevel(root)
     popup.title("Option wählen")
     popup.geometry("500x450")

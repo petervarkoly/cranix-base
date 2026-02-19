@@ -84,10 +84,11 @@ do
   esac
 done
 
-if [[ "${CRANIX_DB_ONLY_ROLES,,}" =~ [[:<:]]${role,,}[[:>:]] ]]; then
-	#This user does not exist in system
-	exit 0
-fi
+for i in ${CRANIX_DB_ONLY_ROLES,,}
+do
+    [ "$i" == "$role" ] && exit 0
+done
+
 #Set fsquota
 /usr/sbin/crx_set_quota.sh $uid $fsquota
 

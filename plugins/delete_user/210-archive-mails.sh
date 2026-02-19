@@ -29,10 +29,11 @@ if [ -z "$uid" ]; then
    exit 4;
 fi
 
-if [[ "${CRANIX_DB_ONLY_ROLES,,}" =~ [[:<:]]${role,,}[[:>:]] ]]; then
-	#This user does not exist in system
-	exit 0
-fi
+for i in ${CRANIX_DB_ONLY_ROLES,,}
+do
+    [ "$i" == "$role" ] && exit 0
+done
+
 MAILDIR="/var/spool/dovecot/${uid}/"
 CANDIR=$( readlink -e ${MAILDIR} )
 DATUM=$( /usr/share/cranix/tools/crx_date.sh )

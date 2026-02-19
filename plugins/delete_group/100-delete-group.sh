@@ -45,10 +45,11 @@ do
   esac
 done
 
-if [[ "${CRANIX_DB_ONLY_ROLES,,}" =~ [[:<:]]${name,,}[[:>:]] ]]; then
-	#This group does not exist in system
-	exit 0
-fi
+for i in ${CRANIX_DB_ONLY_ROLES,,}
+do
+    [ "$i" == "$role" ] && exit 0
+done
+
 echo "name:        $name"
 
 if [ -z "$name" ]; then
