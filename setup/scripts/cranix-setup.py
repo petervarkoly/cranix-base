@@ -7,13 +7,16 @@ import tkinter as tk
 from tkinter import ttk
 from bashconfigparser import BashConfigParser
 
+def netmask_to_cidr(netmask):
+    return ipaddress.IPv4Network(f'0.0.0.0/{netmask}').prefixlen
+
 def ist_valide_ipv4(ip) -> bool:
     try:
         ipaddress.IPv4Address(ip)
         return True
     except ValueError:
         return False
-    
+
 def _(text):
     if language in translation:
         if text in translation[language]:
@@ -30,14 +33,16 @@ def list_physical_interfaces():
             continue
         ip=""
         mac=""
+        nm=""
         # Suche nach der MAC-Adresse (Familie AF_PACKET unter Linux)
         for snic in snics:
             if snic.family == psutil.AF_LINK: # AF_LINK ist die MAC
                 mac = snic.address
             if snic.family == 2: # AF_LINK ist die MAC
                 ip = snic.address
+                nm = netmask_to_cidr(snic.netmask)
         if mac != "":
-            interfaces.append(f"{interface} {mac} {ip}")
+            interfaces.append(f"{interface} {mac} {ip} {nm}")
     interfaces.append('dummy0')
     return interfaces
 
@@ -70,8 +75,8 @@ def showerror(text: str, description: str = ""):
         d.pack()
     b = tk.Button(popup, text="OK", command=confirm)
     b.pack()
-        
-def open_selection_popup(options, variable: tk.Entry):
+
+def open_selection_popup(options, variable: tk.Entry, post: bool = False):
     # 1. Das Popup-Fenster (Toplevel)
     popup = tk.Toplevel(root)
     popup.title("Option wählen")
@@ -124,6 +129,18 @@ def open_selection_popup(options, variable: tk.Entry):
         if selected_value != "free_entry":
             variable.insert(0, selected_value)
             variable.config(state="readonly")
+        if post:
+            try:
+                ext_ip = entry_ext_device.get().split()[2]
+                ext_nm = entry_ext_device.get().split()[3]
+                entry_ext_ip.delete(0, tk.END)
+                entry_ext_ip.insert(0, ext_ip)
+                entry_ext_netmask.config(state="normal")
+                entry_ext_netmask.delete(0, tk.END)
+                entry_ext_netmask.insert(0, ext_nm)
+                entry_ext_netmask.config(state="readonly")
+            except:
+                pass
         popup.destroy()
 
     btn_ok = tk.Button(popup, text="Auswahl übernehmen", command=confirm, bg="#4CAF50", fg="white")
@@ -134,18 +151,19 @@ def open_type_selection():
 
 def open_netmask_selection():
     open_selection_popup(netMasks, entry_netmask)
-    
+
 def open_ext_netmask_selection():
     open_selection_popup(netMasks, entry_ext_netmask)
 
 def open_network_selection():
     open_selection_popup(networks, entry_network)
-    
+
 def open_intern_device_selection():
     open_selection_popup(interfaces, entry_device)
 
 def open_ext_device_selection():
-    open_selection_popup(interfaces, entry_ext_device)
+    open_selection_popup(interfaces, entry_ext_device, True)
+
 
 # Hilfsfunktion für wiederkehrende Elemente
 
@@ -291,56 +309,56 @@ if __name__ == '__main__':
     # Fields on the left side
     entry_name = create_field("Institute Name:", 0, 0)
     entry_domain = create_field("Domain Name:", 1, 0)
-    
+
     btn_type = tk.Button(root, text=_("Select Institute Type"), command=open_type_selection).grid(row=4, column=0, sticky="w", padx=5, pady=(10,0))
     entry_type   = tk.Entry(root, width=width)
     entry_type.grid(row=5, column=0)
     entry_type.insert(0,'gymnasium')
     entry_type.config(state="readonly")
-    
+
     entry_regcode = create_field("Registration Code:", 3, 0)
     entry_pw = create_field("Administrator Password:", 4, 0, is_password=True)
     entry_pw2 = tk.Entry(root, width=width, show="*")
     entry_pw2.grid(row=10, column=0)
-    
+
     # Fields on the right side
-    btn_ipaddress = tk.Button(root, text=_("Select Internal Network"), command=open_network_selection).grid(row=0, column=1, sticky="w", padx=5, pady=(10,0))
+    btn_int_device = tk.Button(root, text=_("Select Internal Device"), command=open_intern_device_selection).grid(row=0, column=1, sticky="w", padx=5, pady=(10,0))
+    entry_device = tk.Entry(root, width=width, state="readonly")
+    entry_device.grid(row=1, column=1)
+
+    btn_ipaddress = tk.Button(root, text=_("Select Internal Network"), command=open_network_selection).grid(row=2, column=1, sticky="w", padx=5, pady=(10,0))
     entry_network = tk.Entry(root, width=width)
-    entry_network.grid(row=1, column=1)
+    entry_network.grid(row=3, column=1)
     entry_network.insert(0,"172.16.0.0")
     entry_network.config(state="readonly")
-    
-    btn_netmask = tk.Button(root, text=_("Netmask"), command=open_netmask_selection).grid(row=0, column=2, sticky="w", padx=(0,5), pady=(10,0))
+
+    btn_netmask = tk.Button(root, text=_("Netmask"), command=open_netmask_selection).grid(row=2, column=2, sticky="w", padx=(0,5), pady=(10,0))
     entry_netmask = tk.Entry(root, width=10)
-    entry_netmask.grid(row=1, column=2, sticky="w")
+    entry_netmask.grid(row=3, column=2, sticky="w")
     entry_netmask.insert(0,"16")
     entry_netmask.config(state="readonly")
-    
-    btn_int_device = tk.Button(root, text=_("Select Internal Device"), command=open_intern_device_selection).grid(row=2, column=1, sticky="w", padx=5, pady=(10,0))
-    entry_device = tk.Entry(root, width=width, state="readonly")
-    entry_device.grid(row=3, column=1)
-    
-    entry_ext_ip = create_field("External IP:", 2, 1)
-    entry_ext_ip.insert(0,"192.168.178.2")
-    
-    btn_ext_netmask = tk.Button(root, text=_("Netmask"), command=open_ext_netmask_selection).grid(row=4, column=2, sticky="w", padx=(0,5), pady=(10,0))
+
+    btn_ext_device = tk.Button(root, text=_("Select External Device"), command=open_ext_device_selection).grid(row=4, column=1, sticky="w", padx=5, pady=(10,0))
+    entry_ext_device = tk.Entry(root, width=width, state="readonly")
+    entry_ext_device.grid(row=5, column=1)
+
+    entry_ext_ip = create_field("External IP:", 3, 1)
+    entry_ext_ip.insert(0, "192.168.178.2")
+
+    btn_ext_netmask = tk.Button(root, text=_("Netmask"), command=open_ext_netmask_selection).grid(row=6, column=2, sticky="w", padx=(0,5), pady=(10,0))
     entry_ext_netmask = tk.Entry(root, width=10)
-    entry_ext_netmask.grid(row=5, column=2, sticky="w")
+    entry_ext_netmask.grid(row=7, column=2, sticky="w")
     entry_ext_netmask.insert(0,"24")
     entry_ext_netmask.config(state="readonly")
-    
-    btn_ext_device = tk.Button(root, text=_("Select External Device"), command=open_ext_device_selection).grid(row=6, column=1, sticky="w", padx=5, pady=(10,0))
-    entry_ext_device = tk.Entry(root, width=width, state="readonly")
-    entry_ext_device.grid(row=7, column=1)
-    
+
     entry_ext_gateway = create_field("External Gateway:", 4, 1)
     entry_ext_gateway.insert(0,"192.168.178.1")
-    # Last button    
+    # Last button
     btn_save  = tk.Button(root, text=_("Save"), command=check_values)
     btn_save.grid(row=12, column=0, pady=15)
     btn_setup = tk.Button(root, text=_("Setup"), command=setup_server)
     btn_setup.grid(row=12, column=1, pady=15)
     btn_abort = tk.Button(root, text=_("Abort"), command=exit)
     btn_abort.grid(row=12, column=2, pady=15)
-    
+
     root.mainloop()
