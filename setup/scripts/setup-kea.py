@@ -163,6 +163,7 @@ for net in networks:
         "max-valid-lifetime": 600,
         "next-server": net_cards[net]['ip'],
         "boot-file-name": "efi/bootx64.efi",
+        "match-client-id": false,
         "option-data": [ { "name": "routers", "data": net_cards[net]['ip'] } ]
     }
     if networks[net] == 1:
