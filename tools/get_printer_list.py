@@ -12,7 +12,7 @@ printers=[]
 printer={}
 name=""
 for line in os.popen('LANG=en_EN lpc status').readlines():
-  match = re.search("([\-\w]+):", line)
+  match = re.search(r"([\-\w]+):", line)
   if match:
      if "name" in printer:
        printers.append(printer)
@@ -24,7 +24,7 @@ for line in os.popen('LANG=en_EN lpc status').readlines():
        printer["windowsDriver"] = False
      next
   #Eval queuing
-  match = re.search("queuing is (\w+)", line)
+  match = re.search(r"queuing is (\w+)", line)
   if match:
      if match.group(1) == "enabled":
        printer["acceptingJobs"] = True
@@ -33,13 +33,13 @@ for line in os.popen('LANG=en_EN lpc status').readlines():
      next
 
   #Eval printing
-  match = re.search("printing is (\w+)", line)
+  match = re.search(r"printing is (\w+)", line)
   if match:
      printer["status"] = match.group(1)
      next
 
   #Eval jobs
-  match = re.search("(\w+) entries", line)
+  match = re.search(r"(\w+) entries", line)
   if match:
      if match.group(1) == "no":
        printer["activeJobs"] = 0
