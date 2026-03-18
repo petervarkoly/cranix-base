@@ -149,6 +149,14 @@ kea_conf = {
                 {
                    "name": "time-servers",
                    "data": cranixconfig.CRANIX_SERVER
+                },
+                {
+                   "name": "lpr-servers",
+                   "data": cranixconfig.CRANIX_PRINTSERVER
+                },
+                {
+                   "name": "netbios-name-servers",
+                   "data": cranixconfig.CRANIX_SERVER
                 }
         ],
         "subnet4": []
@@ -156,6 +164,9 @@ kea_conf = {
 }
 
 for net in networks:
+    router_ip = cranixconfig.CRANIX_SERVER
+    if networks[net] > 1:
+        router_ip = net_cards[net]['ip']
     subnet = {
         "id": networks[net],
         "subnet": net,
@@ -164,7 +175,7 @@ for net in networks:
         "next-server": net_cards[net]['ip'],
         "boot-file-name": "efi/bootx64.efi",
         "match-client-id": false,
-        "option-data": [ { "name": "routers", "data": net_cards[net]['ip'] } ]
+        "option-data": [ { "name": "routers", "data": router_ip } ]
     }
     if networks[net] == 1:
         subnet["pools"] = [ { "pool": cranixconfig.CRANIX_ANON_DHCP_RANGE.replace(" "," - ") } ]
@@ -172,6 +183,7 @@ for net in networks:
 
 with open("/etc/kea/kea-dhcp4.conf","w") as cf:
     cf.write(json.dumps(kea_conf, indent=4, sort_keys=True, ensure_ascii=False))
+
 os.system("echo 'DROP DATABASE IF EXISTS kea_dhcp4'| mariadb")
 os.system("echo 'CREATE DATABASE kea_dhcp4'| mariadb")
 os.system(f"echo 'GRANT ALL ON kea_dhcp4.* TO \"keauser\"@\"localhost\" IDENTIFIED BY \"{password}\"'| mariadb")
