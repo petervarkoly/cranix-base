@@ -62,15 +62,16 @@ else
 fi
 
 if [ "${CRANIX_LOGON_CONNECT_PRINTERS,,}" != "no" ]; then
+	printf "copy \134\134${CRANIX_FILESERVER_NETBIOSNAME}\134software\134cranix\134addPrinter.ps1 Z:\134addPrinter.ps1\r\n" >> /var/lib/samba/sysvol/$R/scripts/${U}.bat;
 	defaultPrinter=$( /usr/sbin/crx_api.sh GET devices/byIP/$I/defaultPrinter )
 	if [ "$defaultPrinter" ]; then
-		printf "rundll32 printui.dll,PrintUIEntry /q /in /n \134\134${CRANIX_PRINTSERVER_NETBIOSNAME}\134${defaultPrinter} /j\"Default ${defaultPrinter}\"\r\n" >> /var/lib/samba/sysvol/$R/scripts/${U}.bat;
-		printf "rundll32 printui.dll,PrintUIEntry /y /n \134\134${CRANIX_PRINTSERVER_NETBIOSNAME}\134${defaultPrinter} /j\"Default ${defaultPrinter}\"\r\n"     >> /var/lib/samba/sysvol/$R/scripts/${U}.bat;
+		printf "powershell.exe -ExecutionPolicy Bypass -File \"Z:\134addPrinter.ps1\" -PrinterName \"$defaultPrinter\" -Default\r\n" >> /var/lib/samba/sysvol/$R/scripts/${U}.bat;
 	fi
 	for printer in $( /usr/sbin/crx_api.sh GET devices/byIP/$I/availablePrinters )
 	do
-		printf "rundll32 printui.dll,PrintUIEntry /q /in /n \134\134${CRANIX_PRINTSERVER_NETBIOSNAME}\134${printer} /j\"${printer}\"\r\n" >> /var/lib/samba/sysvol/$R/scripts/${U}.bat;
+		printf "powershell.exe -ExecutionPolicy Bypass -File \"Z:\134addPrinter.ps1\" -PrinterName \"$printer\"\r\n" >> /var/lib/samba/sysvol/$R/scripts/${U}.bat;
 	done
+	printf "del /Q Z:\134addPrinter.ps1\r\n" >> /var/lib/samba/sysvol/$R/scripts/${U}.bat;
 fi
 
 chown ${U} /var/lib/samba/sysvol/$R/scripts/${U}.bat

@@ -164,7 +164,7 @@ kea_conf = {
 }
 
 for net in networks:
-    router_ip = cranixconfig.CRANIX_SERVER
+    router_ip = cranixconfig.CRANIX_NET_GATEWAY
     if networks[net] > 1:
         router_ip = net_cards[net]['ip']
     subnet = {

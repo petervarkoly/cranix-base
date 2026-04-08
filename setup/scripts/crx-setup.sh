@@ -293,23 +293,8 @@ function SetupPrintserver () {
     	samba-tool dns add localhost $CRANIX_DOMAIN printserver  A $CRANIX_PRINTSERVER   -U register%"$registerpw"
         echo -e "name: printserver\nip: $CRANIX_PRINTSERVER" | /usr/share/cranix/plugins/add_device/101-add-device.py
     fi
-    mkdir -p /var/lib/printserver/{drivers,lock,printing,private}
-    mkdir -p /var/lib/printserver/drivers/{IA64,W32ALPHA,W32MIPS,W32PPC,W32X86,WIN40,x64}
-    chgrp -R $sysadmins_gn /var/lib/printserver/drivers/
-    chmod -R 2775 /var/lib/printserver/drivers
-    mkdir -p /var/log/samba/printserver/
-    sed    "s/#REALM#/$REALM/g"                /usr/share/cranix/setup/templates/samba-printserver.conf.ini > /etc/samba/smb-printserver.conf
-    sed -i "s/#WORKGROUP#/$CRANIX_WORKGROUP/g" /etc/samba/smb-printserver.conf
-    sed -i "s/#IPADDR#/$CRANIX_PRINTSERVER/g"  /etc/samba/smb-printserver.conf
-    if [ "$passwd" ]; then
-        net ADS JOIN -s /etc/samba/smb-printserver.conf -U Administrator%"$passwd"
-    else
-        net ADS JOIN -s /etc/samba/smb-printserver.conf -U register%"$registerpw"
-    fi
-    systemctl enable samba-printserver
-    systemctl start  samba-printserver
-    chgrp -R $sysadmins_gn /var/lib/printserver/drivers
-    setfacl -Rdm g:$sysadmins_gn:rwx /var/lib/printserver/drivers
+    sed s/CRANIX_PRINTSERVER/$CRANIX_PRINTSERVER/ /usr/share/cranix/setup/templates/cupsd.conf.in > /usr/share/cranix/setup/templates/cupsd.conf
+    sed -i s/CRANIX_DOMAIN/$CRANIX_DOMAIN/ /usr/share/cranix/setup/templates/cupsd.conf
     ########################################################################
     log "End Setup Printserver"
 }

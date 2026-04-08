@@ -2,6 +2,7 @@ enable apache2.service
 enable atd.service
 enable clamd.service
 enable cranix-firewall.service
+enable cups.service
 enable freshclam.service
 enable chronyd.service
 enable cranix-api.service
@@ -9,10 +10,8 @@ enable crx_salt_event_watcher.service
 enable salt-master.service
 enable samba-ad.service
 enable samba-fileserver.service
-enable samba-printserver.service
 enable sshd.service
 enable sssd.service
 enable vsftpd.service
 enable xinetd.service
 enable quotad.service
-
