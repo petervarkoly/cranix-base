@@ -293,8 +293,10 @@ function SetupPrintserver () {
     	samba-tool dns add localhost $CRANIX_DOMAIN printserver  A $CRANIX_PRINTSERVER   -U register%"$registerpw"
         echo -e "name: printserver\nip: $CRANIX_PRINTSERVER" | /usr/share/cranix/plugins/add_device/101-add-device.py
     fi
-    sed s/CRANIX_PRINTSERVER/$CRANIX_PRINTSERVER/ /usr/share/cranix/setup/templates/cupsd.conf.in > /usr/share/cranix/setup/templates/cupsd.conf
-    sed -i s/CRANIX_DOMAIN/$CRANIX_DOMAIN/ /usr/share/cranix/setup/templates/cupsd.conf
+    sed s/CRANIX_PRINTSERVER/$CRANIX_PRINTSERVER/ /usr/share/cranix/setup/templates/cupsd.conf > /usr/share/cranix/templates/cupsd.conf
+    sed -i s/CRANIX_DOMAIN/$CRANIX_DOMAIN/ /usr/share/cranix/templates/cupsd.conf
+    cp /etc/cups/cupsd.conf /etc/cups/cupsd.conf.orig
+    cp /usr/share/cranix/templates/cupsd.conf /etc/cups/cupsd.conf
     ########################################################################
     log "End Setup Printserver"
 }
@@ -613,12 +615,6 @@ function PostSetup (){
 	echo "net.ipv4.ip_forward = 1 "              >>  /etc/sysctl.d/cranix.conf
 	echo "net.ipv6.conf.all.forwarding = 1 "     >>  /etc/sysctl.d/cranix.conf
     fi
-
-    ########################################################################
-    log "Setup Cups"
-    cp /etc/cups/cupsd.conf /etc/cups/cupsd.conf.orig
-    cp /etc/cups/cupsd.conf.in /etc/cups/cupsd.conf
-    /usr/share/cranix/tools/sync-cups-to-samba.py
 
     ########################################################################
     log "Prepare roots desktop"
