@@ -1,5 +1,14 @@
 #!/bin/bash
 
+DATE=$( /usr/share/cranix/tools/crx_date.sh )
+NEW_VERSION="16.0"
+#First we make backup
+mkdir -p /var/adm/backup/BEFOR-16
+mysqldump --databases CRX | gzip > /var/adm/backup/BEFOR-16/CRX.sql.gz
+echo "SELECT 'INSERT INTO DefaultPrinter SET room_id=',room_id,',printer_id=',printer_id,';' from DefaultPrinter where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/DefaultPrinter.sql
+echo "SELECT 'INSERT INTO DeviceDefaultPrinter SET device_id=',device_id,',printer_id=',printer_id,';' from DefaultPrinter where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/DeviceDefaultPrinter.sql
+echo "SELECT 'INSERT INTO AvailablePrinters SET room_id=',room_id,',printer_id=',printer_id,';' from AvailablePrinters where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/AvailablePrinter.sql
+echo "SELECT 'INSERT INTO DeviceAvailablePrinters SET device_id=',device_id,',printer_id=',printer_id,';' from AvailablePrinters where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/DeviceAvailablePrinter.sql
 
 # NetworkManager-config-server is required as otherwise NM will immediately add connections for all interfaces, resulting in duplicates.
 # NetworkManager-config-server can be removed after the migration is done.
@@ -17,20 +26,20 @@ systemctl disable --now wicked \
 
 rm /etc/zypp/repos.d/*
 rm /etc/zypp/services.d/*
-sed -i 's/15.6/16.0/g' /etc/zypp/credentials.cat
+sed -i "s/15.6/${NEW_VERSION}/g" /etc/zypp/credentials.cat
 echo "[CRANIX]
 name=CRANIX
 enabled=1
 autorefresh=1
-baseurl=http://repo.cephalix.eu/CRANIX/16.0
+baseurl=http://repo.cephalix.eu/CRANIX/${NEW_VERSION}
 path=/
 priority=10
 gpgcheck=0
 keeppackages=0
 " > /etc/zypp/repos.d/CRANIX.repo
 
-zypper ar https://download.opensuse.org/distribution/leap/16.0/repo/oss/ openLeap-oss
-zypper ar https://download.opensuse.org/distribution/leap/16.0/repo/non-oss/ openLeap-non-oss
+zypper ar https://download.opensuse.org/distribution/leap/${NEW_VERSION}/repo/oss/ openLeap-oss
+zypper ar https://download.opensuse.org/distribution/leap/${NEW_VERSION}/repo/non-oss/ openLeap-non-oss
 zypper ar http://codecs.opensuse.org/openh264/openSUSE_Leap_16 openh264
 
 zypper refresh
@@ -43,5 +52,37 @@ zypper addlock -t pattern kde_office
 zypper addlock -t pattern kdump
 # Optional: Sperren des office-Schemas
 zypper addlock -t pattern office
-zypper -n --releasever 16.0 dup --allow-vendor-change --no-recommends 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-16.0
+zypper -n --releasever ${NEW_VERSION} dup --allow-vendor-change --no-recommends 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-${NEW_VERSION}
+if [ ${CRANIX_TYPE,,} == "cephalix" ]; then
+	JAVA_API="cephalix-api"
+        JAVA_LIB="/opt/cranix-java/lib/cranix-${NEW_VERSION}.jar"
+        JAVA_APPLICATION="de.cranix.api.CephalixxApplication"
+else
+	JAVA_API="cephalix-api"
+        JAVA_LIB="/opt/cranix-java/lib/cranix-${NEW_VERSION}.jar"
+        JAVA_APPLICATION="de.cranix.api.CranixApplication"
+fi
+
+if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "${NEW_VERSION}" ]; then
+	/usr/bin/systemctl stop cron $JAVA_API
+	sleep 30
+        /usr/bin/systemctl enable samba-ad
+        [ -e /etc/samba/smb-printserver.conf ] && /usr/bin/systemctl enable samba-printserver
+        [ -e /etc/samba/smb-fileserver.conf ]  && /usr/bin/systemctl enable samba-fileserver
+	echo "DROP TABLE DefaultPrinter" | /usr/bin/mariadb CRX
+	echo "DROP TABLE AvailablePrinters" | /usr/bin/mariadb CRX
+	java -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp ${JAVA_LIB} ${JAVA_APPLICATION} setupDB
+	sleep 3
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-16/DefaultPrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-16/DeviceDefaultPrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-16/AvailablePrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-16/DeviceAvailablePrinter.sql
+        /sbin/reboot
+else
+        SUPPORT='{"email":"noreply@cephalix.eu","subject":"Migtration to CRANIX-'${NEW_VERSION}' failed","description":"Migtration to CRANIX-'${NEW_VERSION}' failed.","regcode":"'${CRANIX_REG_CODE}'"}'
+        curl -s -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d "${SUPPORT}" ${CRANIX_SUPPORT_URL}
+        echo "Migration failed."
+        echo "A support issue was created."
+        echo "Do not restart the system!!!!"
+fi
 
