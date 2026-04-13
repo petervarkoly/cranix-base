@@ -66,6 +66,11 @@ done
 nameLo="${name,,}"
 name="${name^^}"
 
+for i in ${CRANIX_DB_ONLY_ROLES,,}
+do
+    [ "$i" == "$nameLo" ] && exit 0
+done
+
 echo "name:        $name"
 echo "description: $description"
 echo "groupType:   $groupType"

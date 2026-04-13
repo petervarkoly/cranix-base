@@ -82,6 +82,11 @@ do
   esac
 done
 
+for i in ${CRANIX_DB_ONLY_ROLES,,}
+do
+    [ "$i" == "$role" ] && exit 0
+done
+
 skel="/etc/skel"
 
 if [ -z "${CRANIX_FILESERVER_NETBIOSNAME}" ]; then

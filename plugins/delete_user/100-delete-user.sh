@@ -71,6 +71,11 @@ if [ -z "$uid" ]; then
    exit 4;
 fi
 
+for i in ${CRANIX_DB_ONLY_ROLES,,}
+do
+    [ "$i" == "$role" ] && exit 0
+done
+
 HOMEDIR=$( /usr/sbin/crx_get_home.sh $uid )
 UIDNUMBER=$(  /usr/sbin/crx_get_uidNumber.sh $uid )
 # delete logon script

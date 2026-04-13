@@ -45,6 +45,13 @@ do
   esac
 done
 
+nameUp="${name^^}"
+nameLo="${name,,}"
+for i in ${CRANIX_DB_ONLY_ROLES,,}
+do
+    [ "$i" == "$nameLo" ] && exit 0
+done
+
 echo "name:        $name"
 
 if [ -z "$name" ]; then
@@ -57,8 +64,6 @@ if [ $? != 0 ]; then
    abort
 fi
 
-nameUp="${name^^}"
-nameLo="${name,,}"
 gdir=${CRANIX_HOME_BASE}/groups/${nameUp}
 
 if [ -d "$gdir" ]; then
