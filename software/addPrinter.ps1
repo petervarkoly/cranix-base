@@ -17,7 +17,7 @@ if (-not (Get-Printer -Name $PrinterName -ErrorAction SilentlyContinue)) {
     Add-Printer `
         -Name $PrinterName `
         -DriverName $DriverName `
-        -ConnectionName $Connection
+        -PortName $Connection
 }
 
 # Optional als Standarddrucker setzen
