@@ -1,3 +1,4 @@
+# Call this so: salt 'winminion' state.apply add_printer pillar='{"name": "printer-name" }'
 {% set printer = pillar.get('name', 'DefaultPrinter') %}
 
 install_ipp_printer_{{ printer }}:
