@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/opt/saltstack/salt/bin/python3
 # Copyright (c) 2023 Peter Varkoly <pvarkoly@cephalix.eu> Nuremberg, Germany.  All rights reserved.
 #
 # Copyright (c) Peter Varkoly <peter@varkoly.de> Nuremberg, Germany.  All rights reserved.
