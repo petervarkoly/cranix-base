@@ -604,10 +604,6 @@ function PostSetup (){
     /usr/bin/systemctl start  apache2
 
     ########################################################################
-    log "Install some additional packages"
-    zypper -n install cranix-web cranix-clone cranix-firewall
-
-    ########################################################################
     log "Setup firewall"
     /usr/bin/systemctl enable cranix-firewall
     if [ $CRANIX_ISGATE = "yes" ]; then
@@ -669,7 +665,14 @@ unset _bred _sgr0
     log "Timeserver setup"
     /usr/share/cranix/setup/scripts/setup-chrony.sh
 
-    rm -f /root/Desktop/CRANIX-Setup.desktop
+    ########################################################################
+    log "Create some important directories"
+    mkdir -p /var/adm/cranix/{backup,challenges,opentasks,running,screenShots}
+
+    ########################################################################
+    log "Install some additional packages"
+    zypper -n install cranix-web
+    zypper -n install cranix-clone
 
     log "End PostSetup"
 }
@@ -782,4 +785,7 @@ if [ "$all" = "yes" ] || [ "$postsetup" = "yes" ]; then
 fi
 
 chmod 600 $logfile
+
+reboot
+
 exit 0
