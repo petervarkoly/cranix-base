@@ -291,6 +291,16 @@ if [ "$CRANIX_BACKUP" = "yes" ] || [ "$FORCE" = "yes" ]; then
         done
     fi
 
+    if [ -d "$CRANIX_BACKUP_MAIL" ]; then
+        LOG "Syncing Dovecot Mail Data"
+        mkdir -p $CRANIX_BACKUP_FULL_DIR/$CRANIX_BACKUP_MAIL
+        mkdir -p $BACKUP_DIR/$CRANIX_BACKUP_MAIL
+        /usr/bin/rsync $RSYNCPARS -b --backup-dir=$BACKUP_DIR/$CRANIX_BACKUP_MAIL/ $CRANIX_BACKUP_MAIL/ $CRANIX_BACKUP_FULL_DIR/$CRANIX_BACKUP_MAIL/
+        if [ $? != 0 ]; then
+            LOG " CAN_NOT_MAKE_BACKUP from mail"
+        fi
+    fi
+
     # Now we make recovery easy
     if [ -f /usr/share/cranix/tools/crx_recover.sh ]; then
       cp -f /usr/share/cranix/tools/crx_recover.sh $CRANIX_BACKUP_FULL_DIR/
