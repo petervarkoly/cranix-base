@@ -8,7 +8,7 @@ import re
 import sys
 import cranixconfig
 import time
-from configobj import ConfigObj
+from bashconfigparser import BashConfigParser
 
 #Declare variables
 samba_config_file='/etc/samba/smb.conf'
@@ -47,8 +47,8 @@ homeDirectory: \\\\fileserver\\{1}
 """
 
 #Get password of user register
-api_config  = ConfigObj("/opt/cranix-java/conf/cranix-api.properties")
-register_pw = api_config['de.cranix.dao.User.Register.Password']
+api_config  = BashConfigParser(config_file="/opt/cranix-java/conf/cranix-api.properties")
+register_pw = api_config.get('de.cranix.dao.User.Register.Password')
 
 #Create backup directory
 backup_dir = '/var/adm/cranix/backup/{0}'.format(os.popen('/usr/share/cranix/tools/crx_date.sh').read()).strip()
@@ -154,8 +154,7 @@ for line in os.popen('ldbsearch -H /var/lib/samba/private/sam.ldb  profilePath=*
             os.system('ldbmodify  -H /var/lib/samba/private/sam.ldb {0}'.format(modify_ldif_file.format(backup_dir,user)))
 
 print('Adapt new cranix config file')
-crx_config  = ConfigObj("/etc/sysconfig/cranix",list_values=False,encoding='utf-8',unrepr=True)
-crx_config['CRANIX_FILESERVER'] = next_ip
-crx_config['CRANIX_FILESERVER_NETBIOSNAME'] = 'fileserver'
-crx_config.write()
+crx_config  = BashConfigParser(config_file="/etc/sysconfig/cranix")
+crx_config.set('CRANIX_FILESERVER', next_ip)
+crx_config.set('CRANIX_FILESERVER_NETBIOSNAME', 'fileserver')
 

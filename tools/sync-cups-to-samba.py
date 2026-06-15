@@ -8,7 +8,7 @@ import sys
 import re
 import json
 import cranixconfig
-from configobj import ConfigObj
+from bashconfigparser import BashConfigParser
 
 try:
     print_config_file = cranixconfig.CRANIX_PRINTSERVER_CONFIG
@@ -16,8 +16,8 @@ except AttributeError:
     print_config_file = "/etc/samba/smb-printserver.conf"
 
 server_net = cranixconfig.CRANIX_SERVER_NET
-config = ConfigObj("/opt/cranix-java/conf/cranix-api.properties")
-passwd = config['de.cranix.dao.User.Register.Password']
+config = BashConfigParser(config_file="/opt/cranix-java/conf/cranix-api.properties")
+passwd = config.get('de.cranix.dao.User.Register.Password')
 
 os.system('chgrp -R "SYSADMINS" /var/lib/printserver/drivers')
 os.system('chmod -R 2775 /var/lib/printserver/drivers')

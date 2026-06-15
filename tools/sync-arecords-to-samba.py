@@ -2,12 +2,12 @@
 import json
 import os
 import os.path
-from configobj import ConfigObj
+from bashconfigparser import BashConfigParser
 
 devices=json.load(os.popen('crx_api.sh GET devices/all'))
 domain=os.popen('crx_api_text.sh GET system/configuration/DOMAIN').read()
-config = ConfigObj("/opt/cranix-java/conf/cranix-api.properties")
-passwd = config['de.cranix.dao.User.Register.Password']
+config = BashConfigParser(config_file="/opt/cranix-java/conf/cranix-api.properties")
+passwd = config.get('de.cranix.dao.User.Register.Password')
 for device in devices:
   ip   = device["ip"]
   name = device["name"]

@@ -2,7 +2,7 @@
 
 import os
 import os.path
-from configobj import ConfigObj
+from bashconfigparser import BashConfigParser
 
 # new services to add
 new_services = (
@@ -29,13 +29,13 @@ os.system('cp {0} {1}'.format('/etc/sysconfig/cranix',backup_dir))
 if os.path.exists("/usr/share/cranix/templates/radius/RADIUS-SETTINGS"):
     os.system('/usr/bin/fillup /usr/share/fillup-templates/sysconfig.cranix /usr/share/cranix/templates/radius/RADIUS-SETTINGS /usr/share/fillup-templates/sysconfig.cranix')
 
-fillup_template = ConfigObj('/usr/share/fillup-templates/sysconfig.cranix',list_values=False,encoding='utf-8')
-cranix_conf = ConfigObj('/etc/sysconfig/cranix',list_values=False,encoding='utf-8')
+fillup_template = BashConfigParser(config_file='/usr/share/fillup-templates/sysconfig.cranix')
+cranix_conf = BashConfigParser(config_file='/etc/sysconfig/cranix')
 
 for key in fillup_template:
     if key in cranix_conf:
-        fillup_template[key] = cranix_conf[key]
-services=cranix_conf['CRANIX_MONITOR_SERVICES'].strip('"').strip("'").split()
+        fillup_template.set(key, fillup_template.get(key))
+services=cranix_conf.get('CRANIX_MONITOR_SERVICES')
 for i in old_services:
     if i in services:
         services.remove(i)
@@ -43,10 +43,10 @@ for i in new_services:
     if i not in services:
         services.append(i)
 services.sort()
-fillup_template['CRANIX_MONITOR_SERVICES']="'" + ' '.join(services) + "'"
+fillup_template.set('CRANIX_MONITOR_SERVICES', "'" + ' '.join(services) + "'")
 
-if 'CRANIX_FILESERVER_NETBIOSNAME' in cranix_conf and ( cranix_conf['CRANIX_FILESERVER_NETBIOSNAME'] == '' or  cranix_conf['CRANIX_FILESERVER_NETBIOSNAME'] == '""' ):
-    fillup_template['CRANIX_FILESERVER'] = ""
+if 'CRANIX_FILESERVER_NETBIOSNAME' in cranix_conf.get_all_variables() and ( cranix_conf.get('CRANIX_FILESERVER_NETBIOSNAME') == '' or  cranix_conf.get('CRANIX_FILESERVER_NETBIOSNAME') == '""' ):
+    fillup_template.set('CRANIX_FILESERVER', "")
 
 fillup_template.filename = '/etc/sysconfig/cranix'
 fillup_template.write()
