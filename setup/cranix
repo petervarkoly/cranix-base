@@ -63,10 +63,13 @@ CRANIX_BACKUP_HOME="yes"
 # The path to the directory of the incremental backups.
 CRANIX_BACKUP_INC_DIR="/mnt/backup"
 
-## Type:	yesno
-## Default:	yes
+## Type:	string
+## Default:
 # Make backup from mail system.
-CRANIX_BACKUP_MAIL="yes"
+# For cyrus you can set it to yes. In this case a backup of the directories /var/spool/imap/ and /var/lib/imap/ will be made.
+# For dovecot set here the full path to the mailbox directories. For example /var/spool/dovecot
+# If no backup is needed let it empty.
+CRANIX_BACKUP_MAIL=""
 
 ## Type:        string
 ## Default:
