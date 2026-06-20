@@ -76,7 +76,7 @@ network_counter = network_counter + 1
 try:
     for net in json.load(os.popen('crx_api.sh GET system/enumerates/network')):
         if not net in networks:
-            networks[network] = network_counter
+            networks[net] = network_counter
             network_counter = network_counter + 1
 except Exception:
     pass
@@ -174,7 +174,7 @@ for net in networks:
         "max-valid-lifetime": 600,
         "next-server": net_cards[net]['ip'],
         "boot-file-name": "efi/bootx64.efi",
-        "match-client-id": false,
+        "match-client-id": False,
         "option-data": [ { "name": "routers", "data": router_ip } ]
     }
     if networks[net] == 1:
