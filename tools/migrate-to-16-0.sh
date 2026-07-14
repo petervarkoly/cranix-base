@@ -55,10 +55,10 @@ zypper addlock -t pattern office
 zypper -n --releasever ${NEW_VERSION} dup --allow-vendor-change --no-recommends 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-${NEW_VERSION}
 if [ ${CRANIX_TYPE,,} == "cephalix" ]; then
 	JAVA_API="cephalix-api"
-        JAVA_LIB="/opt/cranix-java/lib/cranix-${NEW_VERSION}.jar"
+        JAVA_LIB="/opt/cranix-java/lib/cephalix-${NEW_VERSION}.jar"
         JAVA_APPLICATION="de.cranix.api.CephalixxApplication"
 else
-	JAVA_API="cephalix-api"
+	JAVA_API="cranix-api"
         JAVA_LIB="/opt/cranix-java/lib/cranix-${NEW_VERSION}.jar"
         JAVA_APPLICATION="de.cranix.api.CranixApplication"
 fi
