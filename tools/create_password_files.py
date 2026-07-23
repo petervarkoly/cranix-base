@@ -42,7 +42,7 @@ with open(user_list) as csvfile:
             fileName = f"{import_dir}/passwordfiles/{group}-{uid}"
         with open(f"{fileName}.html", "w") as f:
             f.write(template)
-        os.system(f"/usr/bin/htmldoc --no-title --no-toc --charset utf-8 -f {fileName}.pdf {fileName}.html")
+        os.system(f"/usr/bin/htmldoc --no-title --no-toc --bodyfont monospace --textfont monospace --charset utf-8 -f {fileName}.pdf {fileName}.html")
 
 if role == 'students':
   for group in all_classes:
