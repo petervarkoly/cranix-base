@@ -148,7 +148,6 @@ ${CRANIX_FILESERVER} fileserver.${CRANIX_DOMAIN} fileserver
 ${CRANIX_PRINTSERVER} printserver.${CRANIX_DOMAIN} printserver
 ${CRANIX_MAILSERVER} mailserver.${CRANIX_DOMAIN} mailserver
 ${CRANIX_PROXY} proxy.${CRANIX_DOMAIN} proxy
-
 ${CRANIX_SERVER_EXT_IP} extip
     " >> /etc/hosts
     log "End PreSetup"
