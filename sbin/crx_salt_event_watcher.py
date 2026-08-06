@@ -28,7 +28,6 @@ opts = salt.config.client_config('/etc/salt/master')
 sevent = salt.utils.event.get_event(
         'master',
         sock_dir=opts['sock_dir'],
-        transport=opts['transport'],
         opts=opts)
 
 event_log_level="warning"
