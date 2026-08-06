@@ -10,9 +10,17 @@ echo "SELECT 'INSERT INTO DeviceDefaultPrinter SET device_id=',device_id,',print
 echo "SELECT 'INSERT INTO AvailablePrinters SET room_id=',room_id,',printer_id=',printer_id,';' from AvailablePrinters where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/AvailablePrinter.sql
 echo "SELECT 'INSERT INTO DeviceAvailablePrinters SET device_id=',device_id,',printer_id=',printer_id,';' from AvailablePrinters where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/DeviceAvailablePrinter.sql
 
+# Remove not used packages
+for i in  patterns-office-office patterns-games-games patterns-kde-kde_games patterns-kde-kde_office patterns-office-office apparmor-utils apparmor-parser-lang apparmor-utils-lang patterns-kde-kde_yast salt-api salt-doc salt-bash-completion
+do
+	rpm -e --nodeps $i
+done
+rpm -e --nodeps $( rpm -qa 'yast2*' )
+rpm -e --nodeps $( rpm -qa 'ruby2*' )
+
 # NetworkManager-config-server is required as otherwise NM will immediately add connections for all interfaces, resulting in duplicates.
 # NetworkManager-config-server can be removed after the migration is done.
-zypper install wicked2nm NetworkManager NetworkManager-config-server || ( echo "==============Migration ERROR============="; echo "wicked2nm is not available. Migration is not possible."; exit 1 )
+zypper -n install wicked2nm NetworkManager NetworkManager-config-server || ( echo "==============Migration ERROR============="; echo "wicked2nm is not available. Migration is not possible."; exit 1 )
 
 # If NetworkManager-config-server is not available you can also manually add the drop-in configuration.
 echo -e "[main]\nno-auto-default=*" > /etc/NetworkManager/conf.d/10-server.conf
