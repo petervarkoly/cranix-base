@@ -577,6 +577,7 @@ function PostSetup (){
     ########################################################################
     log "Setup sssd configuration"
     LDAPBASE=$( crx_get_dn.sh ossreader | sed 's/dn: CN=ossreader,CN=Users,//' )
+    mkdir -p /etc/sssd/
     sed "s/###LDAPBASE###/$LDAPBASE/" /usr/share/cranix/setup/templates/sssd.conf > /etc/sssd/sssd.conf
     sed -i "s/###WORKGROUP###/${CRANIX_WORKGROUP}/" /etc/sssd/sssd.conf
     chmod 600 /etc/sssd/sssd.conf
