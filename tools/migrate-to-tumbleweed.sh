@@ -3,12 +3,12 @@
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
 NEW_VERSION="install"
 #First we make backup
-mkdir -p /var/adm/backup/BEFOR-16
-mysqldump --databases CRX | gzip > /var/adm/backup/BEFOR-16/CRX.sql.gz
-echo "SELECT 'INSERT INTO DefaultPrinter SET room_id=',room_id,',printer_id=',printer_id,';' from DefaultPrinter where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/DefaultPrinter.sql
-echo "SELECT 'INSERT INTO DeviceDefaultPrinter SET device_id=',device_id,',printer_id=',printer_id,';' from DefaultPrinter where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/DeviceDefaultPrinter.sql
-echo "SELECT 'INSERT INTO AvailablePrinters SET room_id=',room_id,',printer_id=',printer_id,';' from AvailablePrinters where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/AvailablePrinter.sql
-echo "SELECT 'INSERT INTO DeviceAvailablePrinters SET device_id=',device_id,',printer_id=',printer_id,';' from AvailablePrinters where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-16/DeviceAvailablePrinter.sql
+mkdir -p /var/adm/backup/BEFOR-Tumbleweed
+mysqldump --databases CRX | gzip > /var/adm/backup/BEFOR-Tumbleweed/CRX.sql.gz
+echo "SELECT 'INSERT INTO DefaultPrinter SET room_id=',room_id,',printer_id=',printer_id,';' from DefaultPrinter where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/DefaultPrinter.sql
+echo "SELECT 'INSERT INTO DeviceDefaultPrinter SET device_id=',device_id,',printer_id=',printer_id,';' from DefaultPrinter where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/DeviceDefaultPrinter.sql
+echo "SELECT 'INSERT INTO AvailablePrinters SET room_id=',room_id,',printer_id=',printer_id,';' from AvailablePrinters where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/AvailablePrinter.sql
+echo "SELECT 'INSERT INTO DeviceAvailablePrinters SET device_id=',device_id,',printer_id=',printer_id,';' from AvailablePrinters where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/DeviceAvailablePrinter.sql
 
 # Remove not used packages
 for i in  patterns-office-office patterns-games-games patterns-kde-kde_games patterns-kde-kde_office patterns-office-office apparmor-utils apparmor-parser-lang apparmor-utils-lang patterns-kde-kde_yast salt-api salt-doc salt-bash-completion
@@ -85,10 +85,10 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "${NEW_VERSION}" ]; then
 	echo "DROP TABLE AvailablePrinters" | /usr/bin/mariadb CRX
 	java -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp ${JAVA_LIB} ${JAVA_APPLICATION} setupDB
 	sleep 3
-	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-16/DefaultPrinter.sql
-	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-16/DeviceDefaultPrinter.sql
-	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-16/AvailablePrinter.sql
-	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-16/DeviceAvailablePrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/DefaultPrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/DeviceDefaultPrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/AvailablePrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/DeviceAvailablePrinter.sql
         /sbin/reboot
 else
         SUPPORT='{"email":"noreply@cephalix.eu","subject":"Migtration to CRANIX-'${NEW_VERSION}' failed","description":"Migtration to CRANIX-'${NEW_VERSION}' failed.","regcode":"'${CRANIX_REG_CODE}'"}'
