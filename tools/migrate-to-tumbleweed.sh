@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
-NEW_VERSION="16.0"
+NEW_VERSION="install"
 #First we make backup
 mkdir -p /var/adm/backup/BEFOR-16
 mysqldump --databases CRX | gzip > /var/adm/backup/BEFOR-16/CRX.sql.gz
@@ -46,9 +46,13 @@ gpgcheck=0
 keeppackages=0
 " > /etc/zypp/repos.d/CRANIX.repo
 
-zypper ar https://download.opensuse.org/distribution/leap/${NEW_VERSION}/repo/oss/ openLeap-oss
-zypper ar https://download.opensuse.org/distribution/leap/${NEW_VERSION}/repo/non-oss/ openLeap-non-oss
-zypper ar http://codecs.opensuse.org/openh264/openSUSE_Leap_16 openh264
+#zypper ar https://download.opensuse.org/distribution/leap/${NEW_VERSION}/repo/oss/ openLeap-oss
+#zypper ar https://download.opensuse.org/distribution/leap/${NEW_VERSION}/repo/non-oss/ openLeap-non-oss
+#zypper ar http://codecs.opensuse.org/openh264/openSUSE_Leap_16 openh264
+
+zypper ar https://download.opensuse.org/tumbleweed/repo/oss/ Tumbleweed-oss
+zypper ar https://download.opensuse.org/tumbleweed/repo/non-oss/ Tumbleweed-non-oss
+zypper ar https://download.opensuse.org/update/tumbleweed/ Tumbleweed-Update
 
 zypper refresh
 # Sperren des games-Schemas
