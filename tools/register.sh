@@ -3,8 +3,7 @@
 . /etc/sysconfig/cranix
 REPO_USER=${CRANIX_REG_CODE:0:9}
 REPO_PASSWORD=${CRANIX_REG_CODE:10:9}
-. /etc/os-release
-
+VERSION_ID="current"
 if [ -z "${REPO_USER}" -o -z "${REPO_PASSWORD}" ]; then
 	echo "Invalid regcode."
 	exit 1

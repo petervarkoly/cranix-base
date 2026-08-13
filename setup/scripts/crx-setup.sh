@@ -468,11 +468,11 @@ function SetupApi (){
     log "Install the right Api package"
     if [ ${CRANIX_TYPE,,} == "cephalix" ]; then
 	    zypper -n install cephalix-java cephalix-base
-	    JAVA_LIB="/opt/cranix-java/lib/cranix-${VERSION_ID}.jar"
+	    JAVA_LIB="/opt/cranix-java/lib/cranix.jar"
 	    JAVA_APPLICATION="de.cranix.api.CephalixxApplication"
     else
 	    zypper -n install cranix-java
-	    JAVA_LIB="/opt/cranix-java/lib/cranix-${VERSION_ID}.jar"
+	    JAVA_LIB="/opt/cranix-java/lib/cranix.jar"
 	    JAVA_APPLICATION="de.cranix.api.CranixApplication"
     fi
     sed -i s/REGISTERPW/$registerpw/ /opt/cranix-java/conf/cranix-api.properties
@@ -638,7 +638,7 @@ FQH=`hostname -f`
 PS1="$FQH:\w # "
 _bred="$(path tput bold 2> /dev/null; path tput setaf 1 2> /dev/null)"
 _sgr0="$(path tput sgr0 2> /dev/null)"
-PS1="${NAME} ${VERSION} \[$_bred\]$PS1\[$_sgr0\]"
+PS1="${NAME} \[$_bred\]$PS1\[$_sgr0\]"
 unset _bred _sgr0
 ' > /root/.profile
 
