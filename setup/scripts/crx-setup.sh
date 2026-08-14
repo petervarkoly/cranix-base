@@ -638,7 +638,7 @@ FQH=`hostname -f`
 PS1="$FQH:\w # "
 _bred="$(path tput bold 2> /dev/null; path tput setaf 1 2> /dev/null)"
 _sgr0="$(path tput sgr0 2> /dev/null)"
-PS1="${NAME} \[$_bred\]$PS1\[$_sgr0\]"
+PS1="'${NAME}' \[$_bred\]$PS1\[$_sgr0\]"
 unset _bred _sgr0
 ' > /root/.profile
 
