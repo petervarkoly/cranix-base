@@ -1,0 +1,16 @@
+patterns-office-office
+patterns-games-games
+patterns-kde-kde_games
+patterns-kde-kde_office
+patterns-office-office
+apparmor-utils
+apparmor-parser-lang
+apparmor-utils-lang
+patterns-kde-kde_yast
+salt-api
+salt-doc
+salt-bash-completion
+patterns-base-apparmor
+cpio-mt
+star-rmt
+tar-rmt

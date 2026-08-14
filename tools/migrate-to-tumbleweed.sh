@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
-NEW_VERSION="install"
+NEW_VERSION="current"
 #First we make backup
 mkdir -p /var/adm/backup/BEFOR-Tumbleweed
 mysqldump --databases CRX | gzip > /var/adm/backup/BEFOR-Tumbleweed/CRX.sql.gz
@@ -11,7 +11,7 @@ echo "SELECT 'INSERT INTO AvailablePrinters SET room_id=',room_id,',printer_id='
 echo "SELECT 'INSERT INTO DeviceAvailablePrinters SET device_id=',device_id,',printer_id=',printer_id,';' from AvailablePrinters where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/DeviceAvailablePrinter.sql
 
 # Remove not used packages
-for i in  patterns-office-office patterns-games-games patterns-kde-kde_games patterns-kde-kde_office patterns-office-office apparmor-utils apparmor-parser-lang apparmor-utils-lang patterns-kde-kde_yast salt-api salt-doc salt-bash-completion
+for i in  $( cat /usr/share/cranix/tools/migrate-to-tumbleweed-remove-packages )
 do
 	rpm -e --nodeps $i
 done
@@ -64,27 +64,27 @@ zypper addlock -t pattern kde_office
 zypper addlock -t pattern kdump
 # Optional: Sperren des office-Schemas
 zypper addlock -t pattern office
-zypper -n --releasever ${NEW_VERSION} dup --allow-vendor-change --no-recommends 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-${NEW_VERSION}
+zypper -n dup --allow-vendor-change --no-recommends 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-${NEW_VERSION}
 if [ ${CRANIX_TYPE,,} == "cephalix" ]; then
 	JAVA_API="cephalix-api"
-        JAVA_LIB="/opt/cranix-java/lib/cephalix-${NEW_VERSION}.jar"
+        JAVA_LIB="/opt/cranix-java/lib/cephalix.jar"
         JAVA_APPLICATION="de.cranix.api.CephalixxApplication"
 else
 	JAVA_API="cranix-api"
-        JAVA_LIB="/opt/cranix-java/lib/cranix-${NEW_VERSION}.jar"
+        JAVA_LIB="/opt/cranix-java/lib/cranix.jar"
         JAVA_APPLICATION="de.cranix.api.CranixApplication"
 fi
 
-if [ "$( rpm -q --qf %{VERSION} cranix-base )" = "${NEW_VERSION}" ]; then
+if [ "$( rpm -q --qf %{VERSION} cranix-base )" != "15.6" ]; then
 	/usr/bin/systemctl stop cron $JAVA_API
-	sleep 30
+	sleep 10
         /usr/bin/systemctl enable samba-ad
         [ -e /etc/samba/smb-printserver.conf ] && /usr/bin/systemctl enable samba-printserver
         [ -e /etc/samba/smb-fileserver.conf ]  && /usr/bin/systemctl enable samba-fileserver
 	echo "DROP TABLE DefaultPrinter" | /usr/bin/mariadb CRX
 	echo "DROP TABLE AvailablePrinters" | /usr/bin/mariadb CRX
 	java -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp ${JAVA_LIB} ${JAVA_APPLICATION} setupDB
-	sleep 3
+	sleep 10
 	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/DefaultPrinter.sql
 	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/DeviceDefaultPrinter.sql
 	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/AvailablePrinter.sql
