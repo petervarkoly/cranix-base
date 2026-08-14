@@ -784,7 +784,7 @@ if [ "$all" = "yes" ] || [ "$postsetup" = "yes" ]; then
 fi
 
 chmod 600 $logfile
-
+rm -f /root/Desktop/CRANIX-Setup.desktop
 reboot
 
 exit 0
