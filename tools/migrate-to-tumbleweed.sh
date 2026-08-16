@@ -91,10 +91,10 @@ if [ "$( rpm -q --qf %{VERSION} cranix-base )" != "15.6" ]; then
 	echo "DROP TABLE AvailablePrinters" | /usr/bin/mariadb CRX
 	java -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp ${JAVA_LIB} ${JAVA_APPLICATION} setupDB
 	sleep 10
-	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/DefaultPrinter.sql
-	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/DeviceDefaultPrinter.sql
-	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/AvailablePrinter.sql
-	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumblewwed/DeviceAvailablePrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumbleweed/DefaultPrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumbleweed/DeviceDefaultPrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumbleweed/AvailablePrinter.sql
+	/usr/bin/mariadb CRX < /var/adm/backup/BEFOR-Tumbleweed/DeviceAvailablePrinter.sql
         /sbin/reboot
 else
         SUPPORT='{"email":"noreply@cephalix.eu","subject":"Migtration to CRANIX-'${NEW_VERSION}' failed","description":"Migtration to CRANIX-'${NEW_VERSION}' failed.","regcode":"'${CRANIX_REG_CODE}'"}'
