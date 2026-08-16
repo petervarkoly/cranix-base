@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source /etc/sysconfig/cranix
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
 NEW_VERSION="current"
 #First we make backup
@@ -10,6 +11,9 @@ echo "SELECT 'INSERT INTO DeviceDefaultPrinter SET device_id=',device_id,',print
 echo "SELECT 'INSERT INTO AvailablePrinters SET room_id=',room_id,',printer_id=',printer_id,';' from AvailablePrinters where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/AvailablePrinter.sql
 echo "SELECT 'INSERT INTO DeviceAvailablePrinters SET device_id=',device_id,',printer_id=',printer_id,';' from AvailablePrinters where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/DeviceAvailablePrinter.sql
 
+# Fix some old misstakes:
+sed -i s/php5/php7/g /etc/sysconfig/apache2
+[ -e /usr/lib64/apache2/mod_php7.so ] && /usr/sbin/a2enmod php7
 # Remove not used packages
 for i in  $( cat /usr/share/cranix/tools/migrate-to-tumbleweed-remove-packages )
 do
@@ -55,6 +59,7 @@ zypper ar https://download.opensuse.org/tumbleweed/repo/non-oss/ Tumbleweed-non-
 zypper ar https://download.opensuse.org/update/tumbleweed/ Tumbleweed-Update
 
 zypper refresh
+zypper addlock "yast2*"
 # Sperren des games-Schemas
 zypper addlock -t pattern games
 # Sperren der KDE-spezifischen Schemata
@@ -64,8 +69,9 @@ zypper addlock -t pattern kde_office
 zypper addlock -t pattern kdump
 # Optional: Sperren des office-Schemas
 zypper addlock -t pattern office
+zypper addlock "libreoffice*"
 zypper -n dup --allow-vendor-change --no-recommends 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-${NEW_VERSION}
-if [ ${CRANIX_TYPE,,} == "cephalix" ]; then
+if [ "${CRANIX_TYPE,,}" == "cephalix" ]; then
 	JAVA_API="cephalix-api"
         JAVA_LIB="/opt/cranix-java/lib/cephalix.jar"
         JAVA_APPLICATION="de.cranix.api.CephalixxApplication"
