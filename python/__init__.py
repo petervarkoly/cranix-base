@@ -52,7 +52,8 @@ stand_users: Set[str] = set([])
 
 date = time.strftime("%Y-%m-%d.%H-%M-%S")
 # read and set some default values
-config    = BashConfigParser("/opt/cranix-java/conf/cranix-api.properties")
+config    = BashConfigParser()
+config.parse_file("/opt/cranix-java/conf/cranix-api.properties")
 passwd    = config.get('de.cranix.dao.User.Register.Password')
 protected_users = config.get('de.cranix.dao.User.protected').split(",")
 domain    = os.popen('/usr/sbin/crx_api_text.sh GET system/configuration/DOMAIN').read()
