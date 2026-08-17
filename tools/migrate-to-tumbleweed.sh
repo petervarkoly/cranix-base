@@ -3,7 +3,8 @@
 source /etc/sysconfig/cranix
 DATE=$( /usr/share/cranix/tools/crx_date.sh )
 NEW_VERSION="current"
-#First we make backup
+echo "======================================="
+echo  "First we make backup from the database"
 mkdir -p /var/adm/backup/BEFOR-Tumbleweed
 mysqldump --databases CRX | gzip > /var/adm/backup/BEFOR-Tumbleweed/CRX.sql.gz
 echo "SELECT 'INSERT INTO DefaultPrinter SET room_id=',room_id,',printer_id=',printer_id,';' from DefaultPrinter where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/DefaultPrinter.sql
@@ -11,17 +12,25 @@ echo "SELECT 'INSERT INTO DeviceDefaultPrinter SET device_id=',device_id,',print
 echo "SELECT 'INSERT INTO AvailablePrinters SET room_id=',room_id,',printer_id=',printer_id,';' from AvailablePrinters where room_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/AvailablePrinter.sql
 echo "SELECT 'INSERT INTO DeviceAvailablePrinters SET device_id=',device_id,',printer_id=',printer_id,';' from AvailablePrinters where device_id > 0" | mysql --skip-column-names CRX > /var/adm/backup/BEFOR-Tumbleweed/DeviceAvailablePrinter.sql
 
-# Fix some old misstakes:
+echo "======================================="
+echo "Fix some old misstakes:"
 sed -i s/php5/php7/g /etc/sysconfig/apache2
 [ -e /usr/lib64/apache2/mod_php7.so ] && /usr/sbin/a2enmod php7
-# Remove not used packages
+echo "======================================="
+echo "Remove not used packages"
 for i in  $( cat /usr/share/cranix/tools/migrate-to-tumbleweed-remove-packages )
 do
 	rpm -e --nodeps $i
+	echo "  $i"
 done
+echo '  yast2*'
 rpm -e --nodeps $( rpm -qa 'yast2*' )
+echo '  ruby*'
 rpm -e --nodeps $( rpm -qa 'ruby2*' )
 
+
+echo "======================================="
+echo "Switch to Network Manager"
 # NetworkManager-config-server is required as otherwise NM will immediately add connections for all interfaces, resulting in duplicates.
 # NetworkManager-config-server can be removed after the migration is done.
 zypper -n install wicked2nm NetworkManager NetworkManager-config-server || ( echo "==============Migration ERROR============="; echo "wicked2nm is not available. Migration is not possible."; exit 1 )
@@ -36,6 +45,8 @@ systemctl disable --now wicked \
     || (systemctl disable --now NetworkManager; systemctl enable --now wicked)
 
 
+echo "======================================="
+echo "Switch to CRANIX-Current"
 rm /etc/zypp/repos.d/*
 rm /etc/zypp/services.d/*
 sed -i "s/15.6/${NEW_VERSION}/g" /etc/zypp/credentials.cat
@@ -59,17 +70,18 @@ zypper ar https://download.opensuse.org/tumbleweed/repo/non-oss/ Tumbleweed-non-
 zypper ar https://download.opensuse.org/update/tumbleweed/ Tumbleweed-Update
 
 zypper refresh
+
+echo "======================================="
+echo "Awoid installing some senceless packages"
+for i in  $( cat /usr/share/cranix/tools/migrate-to-tumbleweed-lock-packages )
+do
+	zypper addlock $i
+done
 zypper addlock "yast2*"
-# Sperren des games-Schemas
-zypper addlock -t pattern games
-# Sperren der KDE-spezifischen Schemata
-zypper addlock -t pattern kde_games
-zypper addlock -t pattern kde_office
-# Sperren des kdump-Schemas
-zypper addlock -t pattern kdump
-# Optional: Sperren des office-Schemas
-zypper addlock -t pattern office
 zypper addlock "libreoffice*"
+
+echo "======================================="
+echo "Start migrating to CRANIX Currrent"
 zypper -n dup --allow-vendor-change --no-recommends 2>&1 | tee /var/log/CRANIX-MIGRATE-TO-${NEW_VERSION}
 if [ "${CRANIX_TYPE,,}" == "cephalix" ]; then
 	JAVA_API="cephalix-api"

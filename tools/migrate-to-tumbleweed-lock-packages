@@ -1,0 +1,15 @@
+patterns-base-apparmor
+patterns-games-games
+patterns-gnome-gnome_office
+patterns-gnome-gnome_yast
+patterns-kde-kde_games
+patterns-kde-kde_office
+patterns-kde-kde_imagingA
+patterns-kde-kde_yast
+patterns-office-office
+patterns-yast-devel_yast
+patterns-yast-x11_yast
+patterns-yast-yast2_basis
+patterns-yast-yast2_desktop
+patterns-yast-yast2_install_wf
+patterns-yast-yast2_server
