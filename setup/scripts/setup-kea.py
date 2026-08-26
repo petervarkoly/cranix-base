@@ -18,7 +18,7 @@ id: {0}
 name: {1}
 ip: {2}
 mac: {3}
-nwlanip: {4}
+wlanip: {4}
 wlanmac: {5}
 roomname: {6}
 """
