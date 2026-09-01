@@ -56,5 +56,9 @@ done
 
 samba-tool group $changeType "$group" $users
 if [ $? != 0 ]; then
-   abort
+        IFS=","
+        for user in $users
+        do
+                samba-tool group $changeType "$group" $user
+        done
 fi
